@@ -22,6 +22,8 @@ create table if not exists public.organizations (
 
 create table if not exists public.apc_admins (
   id uuid primary key default gen_random_uuid(),
+  -- on delete set null preserves historical admin-linked records (audit/report assignments)
+  -- when an auth user is removed.
   user_id uuid references auth.users(id) on delete set null,
   email text unique not null,
   full_name text,
@@ -51,6 +53,7 @@ create table if not exists public.unified_reports (
   description text,
   priority text not null default 'normal' check (priority in ('low', 'normal', 'high', 'critical')),
   status text not null default 'open' check (status in ('open', 'pending', 'in_progress', 'resolved', 'closed')),
+  -- nullable FKs preserve report history if related users/admin records are removed.
   submitted_by uuid references auth.users(id) on delete set null,
   assigned_to uuid references public.apc_admins(id) on delete set null,
   metadata jsonb not null default '{}'::jsonb,
@@ -64,6 +67,7 @@ create table if not exists public.audit_logs (
   admin_id uuid references public.apc_admins(id),
   action text not null,
   target_table text,
+  -- target_id is text to support UUID and non-UUID identifiers across audited tables.
   target_id text,
   details jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now()
@@ -85,6 +89,7 @@ create index if not exists idx_unified_reports_created_at on public.unified_repo
 create index if not exists idx_audit_logs_app_id_created_at on public.audit_logs(app_id, created_at desc);
 create index if not exists idx_analytics_events_app_id_created_at on public.analytics_events(app_id, created_at desc);
 create index if not exists idx_apc_admins_user_id on public.apc_admins(user_id);
+-- one auth user maps to at most one admin profile; null user_id records are allowed pre-linking.
 create unique index if not exists uniq_apc_admins_user_id_not_null on public.apc_admins(user_id) where user_id is not null;
 create index if not exists idx_organizations_app_id on public.organizations(app_id);
 

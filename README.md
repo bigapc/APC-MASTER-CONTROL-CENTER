@@ -103,6 +103,6 @@ await supabase.from('unified_reports').insert({
 
 ## Notes
 
-- Keep the three products separate.
-- Do not merge them into one monolith.
+- Keep the three products separate: each app should retain its own repository, deployment pipeline, and public/admin UX.
+- Do not merge them into one monolith; only share the central backend operational data layer.
 - Use this repository as the central APC control-center foundation.
