@@ -14,7 +14,7 @@ create table if not exists public.apps (
 
 create table if not exists public.apc_admins (
   id uuid primary key default gen_random_uuid(),
-  user_id uuid unique,
+  user_id uuid,
   email text unique not null,
   full_name text,
   role text not null default 'viewer' check (
@@ -77,6 +77,7 @@ create index if not exists idx_unified_reports_created_at on public.unified_repo
 create index if not exists idx_audit_logs_app_id_created_at on public.audit_logs(app_id, created_at desc);
 create index if not exists idx_analytics_events_app_id_created_at on public.analytics_events(app_id, created_at desc);
 create index if not exists idx_apc_admins_user_id on public.apc_admins(user_id);
+create unique index if not exists uniq_apc_admins_user_id_not_null on public.apc_admins(user_id) where user_id is not null;
 
 create or replace function public.current_admin_role()
 returns text
@@ -94,7 +95,7 @@ returns text[]
 language sql
 stable
 as $$
-  select coalesce(a.app_access, '{}')
+  select a.app_access
   from public.apc_admins a
   where a.user_id = auth.uid() and a.is_active = true
   limit 1;
