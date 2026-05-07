@@ -98,10 +98,12 @@ returns text
 language sql
 stable
 as $$
-  select a.role
-  from public.apc_admins a
-  where a.user_id = auth.uid() and a.is_active = true
-  limit 1;
+  select coalesce((
+    select a.role
+    from public.apc_admins a
+    where a.user_id = auth.uid() and a.is_active = true
+    limit 1
+  ), 'none');
 $$;
 
 create or replace function public.current_admin_app_access()
@@ -109,10 +111,12 @@ returns text[]
 language sql
 stable
 as $$
-  select a.app_access
-  from public.apc_admins a
-  where a.user_id = auth.uid() and a.is_active = true
-  limit 1;
+  select coalesce((
+    select a.app_access
+    from public.apc_admins a
+    where a.user_id = auth.uid() and a.is_active = true
+    limit 1
+  ), '{}'::text[]);
 $$;
 
 alter table public.apps enable row level security;

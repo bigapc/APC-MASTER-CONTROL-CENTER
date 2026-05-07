@@ -83,9 +83,13 @@ Use a shared app config pattern in each child app:
 
 ```ts
 export const APP_CONFIG = {
-  appId: process.env.NEXT_PUBLIC_APP_ID || 'safeconnect',
+  appId: process.env.NEXT_PUBLIC_APP_ID || '__unset__',
   appName: process.env.NEXT_PUBLIC_APP_NAME || 'SafeConnect',
 };
+
+if (APP_CONFIG.appId === '__unset__') {
+  throw new Error('NEXT_PUBLIC_APP_ID is required');
+}
 ```
 
 And ensure writes include `app_id`:
