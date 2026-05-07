@@ -64,7 +64,7 @@ create table if not exists public.unified_reports (
 create table if not exists public.audit_logs (
   id uuid primary key default gen_random_uuid(),
   app_id text not null references public.apps(id),
-  admin_id uuid references public.apc_admins(id),
+  admin_id uuid references public.apc_admins(id) on delete set null,
   action text not null,
   target_table text,
   -- target_id is text to support UUID and non-UUID identifiers across audited tables.
@@ -77,7 +77,7 @@ create table if not exists public.analytics_events (
   id uuid primary key default gen_random_uuid(),
   app_id text not null references public.apps(id),
   event_name text not null,
-  user_id uuid,
+  user_id uuid references auth.users(id) on delete set null,
   session_id text,
   page_path text,
   metadata jsonb not null default '{}'::jsonb,
