@@ -179,7 +179,6 @@ create policy "scoped_reports_access"
 on public.unified_reports for select
 using (
   public.current_admin_role() <> 'none'
-  and cardinality(public.current_admin_app_access()) > 0
   and app_id = any(public.current_admin_app_access())
 );
 
@@ -188,7 +187,6 @@ create policy "scoped_organizations_access"
 on public.organizations for select
 using (
   public.current_admin_role() <> 'none'
-  and cardinality(public.current_admin_app_access()) > 0
   and app_id = any(public.current_admin_app_access())
 );
 
@@ -197,7 +195,6 @@ create policy "scoped_reports_write"
 on public.unified_reports for insert
 with check (
   public.current_admin_role() <> 'none'
-  and cardinality(public.current_admin_app_access()) > 0
   and app_id = any(public.current_admin_app_access())
 );
 
@@ -206,12 +203,10 @@ create policy "scoped_reports_update"
 on public.unified_reports for update
 using (
   public.current_admin_role() <> 'none'
-  and cardinality(public.current_admin_app_access()) > 0
   and app_id = any(public.current_admin_app_access())
 )
 with check (
   public.current_admin_role() <> 'none'
-  and cardinality(public.current_admin_app_access()) > 0
   and app_id = any(public.current_admin_app_access())
 );
 
@@ -220,7 +215,6 @@ create policy "scoped_audit_access"
 on public.audit_logs for select
 using (
   public.current_admin_role() <> 'none'
-  and cardinality(public.current_admin_app_access()) > 0
   and app_id = any(public.current_admin_app_access())
 );
 
@@ -229,7 +223,6 @@ create policy "scoped_audit_write"
 on public.audit_logs for insert
 with check (
   public.current_admin_role() <> 'none'
-  and cardinality(public.current_admin_app_access()) > 0
   and app_id = any(public.current_admin_app_access())
   and (admin_id is null or admin_id = public.current_admin_id())
 );
@@ -239,7 +232,6 @@ create policy "scoped_analytics_access"
 on public.analytics_events for select
 using (
   public.current_admin_role() <> 'none'
-  and cardinality(public.current_admin_app_access()) > 0
   and app_id = any(public.current_admin_app_access())
 );
 
@@ -248,7 +240,6 @@ create policy "scoped_analytics_write"
 on public.analytics_events for insert
 with check (
   public.current_admin_role() <> 'none'
-  and cardinality(public.current_admin_app_access()) > 0
   and app_id = any(public.current_admin_app_access())
 );
 
@@ -256,5 +247,5 @@ insert into public.apps (id, name, slug, status)
 values
   ('safeconnect', 'SafeConnect', 'safeconnect', 'active'),
   ('communitysafeconnect', 'CommunitySafeConnect', 'communitysafeconnect', 'active'),
-  ('csc_2_0', 'CommunitySafeConnect-CSC-2.0', 'csc_2_0', 'active')
+  ('csc_2_0', 'CommunitySafeConnect-CSC-2.0', 'csc-2-0', 'active')
 on conflict (id) do nothing;
