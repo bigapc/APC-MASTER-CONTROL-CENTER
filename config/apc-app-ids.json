@@ -1,0 +1,16 @@
+{
+  "apps": [
+    {
+      "id": "safeconnect",
+      "name": "SafeConnect"
+    },
+    {
+      "id": "communitysafeconnect",
+      "name": "CommunitySafeConnect"
+    },
+    {
+      "id": "csc_2_0",
+      "name": "CommunitySafeConnect-CSC-2.0"
+    }
+  ]
+}
