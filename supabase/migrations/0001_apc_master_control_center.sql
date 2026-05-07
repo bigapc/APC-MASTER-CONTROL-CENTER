@@ -12,9 +12,17 @@ create table if not exists public.apps (
   created_at timestamptz not null default now()
 );
 
+create table if not exists public.organizations (
+  id uuid primary key default gen_random_uuid(),
+  app_id text not null references public.apps(id),
+  name text not null,
+  status text not null default 'active' check (status in ('active', 'inactive')),
+  created_at timestamptz not null default now()
+);
+
 create table if not exists public.apc_admins (
   id uuid primary key default gen_random_uuid(),
-  user_id uuid,
+  user_id uuid references auth.users(id) on delete set null,
   email text unique not null,
   full_name text,
   role text not null default 'viewer' check (
@@ -30,7 +38,7 @@ create table if not exists public.apc_admins (
     )
   ),
   app_access text[] not null default '{}',
-  organization_id uuid,
+  organization_id uuid references public.organizations(id) on delete set null,
   is_active boolean not null default true,
   created_at timestamptz not null default now()
 );
@@ -43,8 +51,8 @@ create table if not exists public.unified_reports (
   description text,
   priority text not null default 'normal' check (priority in ('low', 'normal', 'high', 'critical')),
   status text not null default 'open' check (status in ('open', 'pending', 'in_progress', 'resolved', 'closed')),
-  submitted_by uuid,
-  assigned_to uuid,
+  submitted_by uuid references auth.users(id) on delete set null,
+  assigned_to uuid references public.apc_admins(id) on delete set null,
   metadata jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -78,6 +86,7 @@ create index if not exists idx_audit_logs_app_id_created_at on public.audit_logs
 create index if not exists idx_analytics_events_app_id_created_at on public.analytics_events(app_id, created_at desc);
 create index if not exists idx_apc_admins_user_id on public.apc_admins(user_id);
 create unique index if not exists uniq_apc_admins_user_id_not_null on public.apc_admins(user_id) where user_id is not null;
+create index if not exists idx_organizations_app_id on public.organizations(app_id);
 
 create or replace function public.current_admin_role()
 returns text
@@ -102,6 +111,7 @@ as $$
 $$;
 
 alter table public.apps enable row level security;
+alter table public.organizations enable row level security;
 alter table public.apc_admins enable row level security;
 alter table public.unified_reports enable row level security;
 alter table public.audit_logs enable row level security;
@@ -116,6 +126,11 @@ using (public.current_admin_role() = 'super_admin');
 drop policy if exists "super_admin_all_admins_select" on public.apc_admins;
 create policy "super_admin_all_admins_select"
 on public.apc_admins for select
+using (public.current_admin_role() = 'super_admin');
+
+drop policy if exists "super_admin_all_organizations_select" on public.organizations;
+create policy "super_admin_all_organizations_select"
+on public.organizations for select
 using (public.current_admin_role() = 'super_admin');
 
 drop policy if exists "super_admin_reports_all" on public.unified_reports;
@@ -140,6 +155,11 @@ with check (public.current_admin_role() = 'super_admin');
 drop policy if exists "scoped_reports_access" on public.unified_reports;
 create policy "scoped_reports_access"
 on public.unified_reports for select
+using (app_id = any(public.current_admin_app_access()));
+
+drop policy if exists "scoped_organizations_access" on public.organizations;
+create policy "scoped_organizations_access"
+on public.organizations for select
 using (app_id = any(public.current_admin_app_access()));
 
 drop policy if exists "scoped_reports_write" on public.unified_reports;
@@ -177,5 +197,5 @@ insert into public.apps (id, name, slug, status)
 values
   ('safeconnect', 'SafeConnect', 'safeconnect', 'active'),
   ('communitysafeconnect', 'CommunitySafeConnect', 'communitysafeconnect', 'active'),
-  ('csc_2_0', 'CommunitySafeConnect-CSC-2.0', 'csc-2-0', 'active')
+  ('csc_2_0', 'CommunitySafeConnect-CSC-2.0', 'csc_2_0', 'active')
 on conflict (id) do nothing;

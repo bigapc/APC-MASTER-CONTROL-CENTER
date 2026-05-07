@@ -4,7 +4,7 @@ Central private control center for monitoring and managing:
 
 - SafeConnect (`safeconnect`)
 - CommunitySafeConnect (`communitysafeconnect`)
-- CommunitySafeConnect-CSC-2.0 (`csc_2_0`)
+- CSC 2.0 (`csc_2_0`)
 
 Each child app remains independent (repo, deployment, public/admin UX), while all apps send operational data into one shared APC backend.
 
@@ -46,6 +46,7 @@ Apply this migration in your Supabase project:
 What it creates:
 
 - `apps`
+- `organizations`
 - `apc_admins`
 - `unified_reports`
 - `audit_logs`
