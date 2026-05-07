@@ -88,7 +88,7 @@ create index if not exists idx_unified_reports_app_id_status on public.unified_r
 create index if not exists idx_unified_reports_created_at on public.unified_reports(created_at desc);
 create index if not exists idx_audit_logs_app_id_created_at on public.audit_logs(app_id, created_at desc);
 create index if not exists idx_analytics_events_app_id_created_at on public.analytics_events(app_id, created_at desc);
-create index if not exists idx_apc_admins_user_id on public.apc_admins(user_id);
+create index if not exists idx_apc_admins_user_id on public.apc_admins(user_id) where user_id is not null;
 -- one auth user maps to at most one admin profile; null user_id records are allowed pre-linking.
 create unique index if not exists uniq_apc_admins_user_id_not_null on public.apc_admins(user_id) where user_id is not null;
 create index if not exists idx_organizations_app_id on public.organizations(app_id);
@@ -102,7 +102,6 @@ as $$
     select a.role
     from public.apc_admins a
     where a.user_id = auth.uid() and a.is_active = true
-    order by a.created_at desc
     limit 1
   ), 'none');
 $$;
@@ -116,7 +115,6 @@ as $$
     select a.id
     from public.apc_admins a
     where a.user_id = auth.uid() and a.is_active = true
-    order by a.created_at desc
     limit 1
   );
 $$;
@@ -130,7 +128,6 @@ as $$
     select a.app_access
     from public.apc_admins a
     where a.user_id = auth.uid() and a.is_active = true
-    order by a.created_at desc
     limit 1
   ), '{}'::text[]);
 $$;
