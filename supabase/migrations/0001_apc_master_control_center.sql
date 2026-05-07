@@ -102,8 +102,23 @@ as $$
     select a.role
     from public.apc_admins a
     where a.user_id = auth.uid() and a.is_active = true
+    order by a.created_at desc
     limit 1
   ), 'none');
+$$;
+
+create or replace function public.current_admin_id()
+returns uuid
+language sql
+stable
+as $$
+  select (
+    select a.id
+    from public.apc_admins a
+    where a.user_id = auth.uid() and a.is_active = true
+    order by a.created_at desc
+    limit 1
+  );
 $$;
 
 create or replace function public.current_admin_app_access()
@@ -115,6 +130,7 @@ as $$
     select a.app_access
     from public.apc_admins a
     where a.user_id = auth.uid() and a.is_active = true
+    order by a.created_at desc
     limit 1
   ), '{}'::text[]);
 $$;
@@ -164,43 +180,80 @@ with check (public.current_admin_role() = 'super_admin');
 drop policy if exists "scoped_reports_access" on public.unified_reports;
 create policy "scoped_reports_access"
 on public.unified_reports for select
-using (app_id = any(public.current_admin_app_access()));
+using (
+  public.current_admin_role() <> 'none'
+  and cardinality(public.current_admin_app_access()) > 0
+  and app_id = any(public.current_admin_app_access())
+);
 
 drop policy if exists "scoped_organizations_access" on public.organizations;
 create policy "scoped_organizations_access"
 on public.organizations for select
-using (app_id = any(public.current_admin_app_access()));
+using (
+  public.current_admin_role() <> 'none'
+  and cardinality(public.current_admin_app_access()) > 0
+  and app_id = any(public.current_admin_app_access())
+);
 
 drop policy if exists "scoped_reports_write" on public.unified_reports;
 create policy "scoped_reports_write"
 on public.unified_reports for insert
-with check (app_id = any(public.current_admin_app_access()));
+with check (
+  public.current_admin_role() <> 'none'
+  and cardinality(public.current_admin_app_access()) > 0
+  and app_id = any(public.current_admin_app_access())
+);
 
 drop policy if exists "scoped_reports_update" on public.unified_reports;
 create policy "scoped_reports_update"
 on public.unified_reports for update
-using (app_id = any(public.current_admin_app_access()))
-with check (app_id = any(public.current_admin_app_access()));
+using (
+  public.current_admin_role() <> 'none'
+  and cardinality(public.current_admin_app_access()) > 0
+  and app_id = any(public.current_admin_app_access())
+)
+with check (
+  public.current_admin_role() <> 'none'
+  and cardinality(public.current_admin_app_access()) > 0
+  and app_id = any(public.current_admin_app_access())
+);
 
 drop policy if exists "scoped_audit_access" on public.audit_logs;
 create policy "scoped_audit_access"
 on public.audit_logs for select
-using (app_id = any(public.current_admin_app_access()));
+using (
+  public.current_admin_role() <> 'none'
+  and cardinality(public.current_admin_app_access()) > 0
+  and app_id = any(public.current_admin_app_access())
+);
 
 drop policy if exists "scoped_audit_write" on public.audit_logs;
 create policy "scoped_audit_write"
 on public.audit_logs for insert
-with check (app_id = any(public.current_admin_app_access()));
+with check (
+  public.current_admin_role() <> 'none'
+  and cardinality(public.current_admin_app_access()) > 0
+  and app_id = any(public.current_admin_app_access())
+  and (admin_id is null or admin_id = public.current_admin_id())
+);
 
 drop policy if exists "scoped_analytics_access" on public.analytics_events;
 create policy "scoped_analytics_access"
 on public.analytics_events for select
-using (app_id = any(public.current_admin_app_access()));
+using (
+  public.current_admin_role() <> 'none'
+  and cardinality(public.current_admin_app_access()) > 0
+  and app_id = any(public.current_admin_app_access())
+);
 
 drop policy if exists "scoped_analytics_write" on public.analytics_events;
 create policy "scoped_analytics_write"
 on public.analytics_events for insert
-with check (app_id = any(public.current_admin_app_access()));
+with check (
+  public.current_admin_role() <> 'none'
+  and cardinality(public.current_admin_app_access()) > 0
+  and app_id = any(public.current_admin_app_access())
+);
 
 insert into public.apps (id, name, slug, status)
 values
