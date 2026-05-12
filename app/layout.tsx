@@ -4,7 +4,8 @@ import Sidebar from "@/components/Sidebar";
 
 export const metadata: Metadata = {
   title: "APC Master Control Center",
-  description: "Unified backend control center for APC applications.",
+  description:
+    "Saving Lives and Building Stronger Communities through Safety and Connections.",
 };
 
 export default function RootLayout({
@@ -14,10 +15,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
-        <div className="flex min-h-screen bg-slate-100">
+      <body className="apc-shell-bg">
+        <div className="flex min-h-screen">
           <Sidebar />
-          <main className="flex-1 p-8">{children}</main>
+          <main className="flex-1 p-6 md:p-8">{children}</main>
         </div>
       </body>
     </html>
