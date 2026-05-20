@@ -20,6 +20,7 @@ export const APP_CONFIG = {
       health: "stable",
       publicUrl: process.env.NEXT_PUBLIC_SAFECONNECT_PUBLIC_URL || "#",
       adminUrl: process.env.NEXT_PUBLIC_SAFECONNECT_ADMIN_URL || "#",
+      accent: "Emergency Safety",
     },
     {
       id: "communitysafeconnect",
@@ -31,6 +32,7 @@ export const APP_CONFIG = {
       health: "stable",
       publicUrl: process.env.NEXT_PUBLIC_COMMUNITYSAFECONNECT_PUBLIC_URL || "#",
       adminUrl: process.env.NEXT_PUBLIC_COMMUNITYSAFECONNECT_ADMIN_URL || "#",
+      accent: "Community Operations",
     },
     {
       id: "csc_2_0",
@@ -42,6 +44,7 @@ export const APP_CONFIG = {
       health: "stable",
       publicUrl: process.env.NEXT_PUBLIC_CSC_2_PUBLIC_URL || "#",
       adminUrl: process.env.NEXT_PUBLIC_CSC_2_ADMIN_URL || "#",
+      accent: "Command Operations",
     },
   ],
 };
@@ -100,6 +103,94 @@ export const DEMO_ALERTS = [
     app: "APC Master Control Center",
     priority: "Normal",
     message: "Repo bigapc/APC-MASTER-CONTROL-CENTER is the active build target.",
+  },
+];
+
+export const DEMO_REPORTS = [
+  {
+    id: "RPT-1001",
+    app: "SafeConnect",
+    type: "Safety Exchange Request",
+    priority: "High",
+    status: "Open",
+    submittedBy: "Protected User",
+    assignedTo: "Unassigned",
+    created: "Today",
+  },
+  {
+    id: "RPT-1002",
+    app: "CommunitySafeConnect",
+    type: "Community Concern",
+    priority: "Normal",
+    status: "Review",
+    submittedBy: "Community Member",
+    assignedTo: "APC Staff",
+    created: "Today",
+  },
+  {
+    id: "RPT-1003",
+    app: "CSC 2.0",
+    type: "Dispatcher Follow-up",
+    priority: "Medium",
+    status: "Pending",
+    submittedBy: "Agency Partner",
+    assignedTo: "Dispatcher",
+    created: "Yesterday",
+  },
+];
+
+export const DEMO_USERS = [
+  {
+    name: "Darrell Armstrong",
+    email: "apjune3@gmail.com",
+    role: "Super Admin",
+    access: "All Applications",
+    status: "Active",
+  },
+  {
+    name: "APC Dispatcher",
+    email: "dispatcher@apc-control.local",
+    role: "Dispatcher",
+    access: "SafeConnect, CSC 2.0",
+    status: "Pending Setup",
+  },
+  {
+    name: "SafeConnect Admin",
+    email: "safeconnect-admin@apc-control.local",
+    role: "App Admin",
+    access: "SafeConnect",
+    status: "Pending Setup",
+  },
+];
+
+export const DEMO_AUDIT_LOGS = [
+  {
+    action: "Control Center initialized",
+    app: "APC Master Control Center",
+    actor: "System",
+    time: "Today",
+    severity: "Info",
+  },
+  {
+    action: "Connected application registry prepared",
+    app: "All Apps",
+    actor: "System",
+    time: "Today",
+    severity: "Info",
+  },
+  {
+    action: "Role architecture staged",
+    app: "Admin Access",
+    actor: "System",
+    time: "Today",
+    severity: "Security",
+  },
+  {
+    action: "Owner identity pinned",
+    app: "Backend Status",
+    actor: "Darrell Armstrong",
+    time: "Today",
+    severity: "Security",
   },
 ];
 
