@@ -1,42 +1,61 @@
 import { APP_CONFIG } from "@/lib/appConfig";
+import { ExternalLink, ShieldCheck } from "lucide-react";
 
 export default function AppsPage() {
   return (
-    <div>
-      <h1 className="text-3xl font-bold text-slate-950">Connected Apps</h1>
+    <div className="space-y-8">
+      <section className="apc-card-dark p-8">
+        <div className="apc-badge">Application Registry</div>
+        <h1 className="mt-4 text-4xl font-black text-white">Connected APC Platforms</h1>
+        <p className="mt-3 max-w-3xl leading-7 text-zinc-300">
+          Manage each individual app while keeping all monitoring connected to one APC Master Control Center.
+        </p>
+      </section>
 
-      <p className="mt-2 text-slate-600">
-        Manage which APC applications connect to the master control center.
-      </p>
+      <section className="grid gap-6 lg:grid-cols-3">
+        {APP_CONFIG.apps.map((app) => (
+          <div key={app.id} className="apc-card p-6">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-zinc-950 text-white">
+              <ShieldCheck size={24} />
+            </div>
 
-      <div className="mt-8 rounded-2xl bg-white p-6 shadow">
-        <div className="overflow-hidden rounded-xl border">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-slate-100 text-slate-700">
-              <tr>
-                <th className="p-4">App Name</th>
-                <th className="p-4">App ID</th>
-                <th className="p-4">Status</th>
-                <th className="p-4">Description</th>
-              </tr>
-            </thead>
-            <tbody>
-              {APP_CONFIG.apps.map((app) => (
-                <tr key={app.id} className="border-t">
-                  <td className="p-4 font-semibold text-slate-950">{app.name}</td>
-                  <td className="p-4 font-mono text-slate-600">{app.id}</td>
-                  <td className="p-4">
-                    <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">
-                      {app.status}
-                    </span>
-                  </td>
-                  <td className="p-4 text-slate-600">{app.description}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+            <h2 className="mt-5 text-2xl font-black text-zinc-950">{app.name}</h2>
+            <p className="mt-1 text-xs font-black uppercase tracking-wide text-[#c1121f]">{app.division}</p>
+            <p className="mt-4 leading-7 text-zinc-600">{app.description}</p>
+
+            <div className="mt-5 grid gap-3">
+              <div className="rounded-2xl bg-zinc-50 p-4">
+                <p className="text-xs font-black uppercase text-zinc-500">App ID</p>
+                <p className="mt-1 font-mono text-sm text-zinc-900">{app.id}</p>
+              </div>
+              <div className="rounded-2xl bg-zinc-50 p-4">
+                <p className="text-xs font-black uppercase text-zinc-500">Health</p>
+                <p className="mt-1 font-bold text-green-700">{app.health}</p>
+              </div>
+              <div className="rounded-2xl bg-zinc-50 p-4">
+                <p className="text-xs font-black uppercase text-zinc-500">Division Focus</p>
+                <p className="mt-1 font-bold text-zinc-900">{app.accent}</p>
+              </div>
+            </div>
+
+            <div className="mt-6 flex gap-3">
+              <a href={app.adminUrl} className="apc-button-primary flex-1">
+                <ExternalLink size={16} /> Admin
+              </a>
+              <a href={app.publicUrl} className="apc-button-secondary flex-1">
+                <ExternalLink size={16} /> Public
+              </a>
+            </div>
+          </div>
+        ))}
+      </section>
+
+      <section className="apc-card p-6">
+        <h2 className="text-2xl font-black">Architecture Note</h2>
+        <p className="mt-3 leading-7 text-zinc-600">
+          Each app remains separate for public use and individual admin control. The APC Master Control Center monitors them through shared app IDs, role-based access, unified reports, analytics events, and audit logs.
+        </p>
+      </section>
     </div>
   );
 }
