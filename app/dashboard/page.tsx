@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { APP_CONFIG, DAILY_OPERATION_CHECKLIST, DEMO_ALERTS, STAFF_PERFORMANCE } from "@/lib/appConfig";
-import { Activity, AlertTriangle, ArrowRight, Building2, CheckSquare, FileText, Map, Radio, Shield, Trophy, Users } from "lucide-react";
+import { getRuntimeStatus } from "@/lib/runtimeStatus";
+import { Activity, AlertTriangle, ArrowRight, Building2, CheckSquare, Database, FileText, Map, Radio, Shield, Trophy, Users } from "lucide-react";
 
 const stats = [
   { label: "Connected Apps", value: "3", icon: Activity },
@@ -16,7 +17,9 @@ const commandTiles = [
   { title: "Staff Performance", href: "/staff-performance", icon: Trophy, text: "Track role activity, output, and pending setup items." },
 ];
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const runtime = await getRuntimeStatus();
+
   return (
     <div className="space-y-8">
       <section className="apc-card-dark p-8 md:p-10">
@@ -39,6 +42,9 @@ export default function DashboardPage() {
           <div className="grid w-full max-w-md gap-4">
             <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
               <div className="flex items-center gap-3"><Shield className="text-[#ff5a66]" size={20} /><div><p className="text-sm font-semibold text-white">Owner Identity</p><p className="text-sm text-zinc-400">{APP_CONFIG.ownerName} · {APP_CONFIG.ownerEmail}</p></div></div>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+              <div className="flex items-center gap-3"><Database className="text-[#ff5a66]" size={20} /><div><p className="text-sm font-semibold text-white">Runtime Mode</p><p className="text-sm text-zinc-400">{runtime.label}</p></div></div>
             </div>
             <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
               <div className="flex items-center gap-3"><AlertTriangle className="text-[#ff5a66]" size={20} /><div><p className="text-sm font-semibold text-white">Priority Monitoring</p><p className="text-sm text-zinc-400">Alerts, dispatch, reports, and backend checks staged</p></div></div>
