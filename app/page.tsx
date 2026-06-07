@@ -28,7 +28,7 @@ export default function HomePage() {
             </p>
           </div>
 
-          <Link href="/dashboard" className="apc-button-primary mt-8">
+          <Link href="/login" className="apc-button-primary mt-8">
             Enter Control Center <ArrowRight size={18} />
           </Link>
         </section>

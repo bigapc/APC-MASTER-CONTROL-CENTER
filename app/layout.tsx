@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Sidebar from "@/components/Sidebar";
+import RootProvider from "@/components/providers/RootProvider";
+import { logEnvCheck } from "@/lib/config/envCheck";
 
 export const metadata: Metadata = {
   title: "APC Master Control Center",
@@ -13,13 +14,14 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  logEnvCheck();
+
   return (
     <html lang="en">
-      <body className="apc-shell-bg">
-        <div className="flex min-h-screen">
-          <Sidebar />
-          <main className="flex-1 p-6 md:p-8">{children}</main>
-        </div>
+      <body>
+        <RootProvider>
+          {children}
+        </RootProvider>
       </body>
     </html>
   );

@@ -1,38 +1,37 @@
 import Link from "next/link";
 import {
   Activity,
-  AlertTriangle,
   AppWindow,
   BarChart3,
-  CheckSquare,
-  FileText,
+  Building2,
+  KeyRound,
   LayoutDashboard,
-  Map,
+  Landmark,
+  Network,
   Radio,
+  Shield,
   Server,
   Settings,
-  ShieldCheck,
-  Trophy,
   Users,
 } from "lucide-react";
 import { APP_CONFIG } from "@/lib/appConfig";
+import { SIDEBAR_LINKS } from "@/lib/navigation";
 
-const navItems = [
-  { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { label: "Applications", href: "/apps", icon: AppWindow },
-  { label: "Control Hubs", href: "/control-hubs", icon: ShieldCheck },
-  { label: "Operations", href: "/operations", icon: Radio },
-  { label: "Daily Checklist", href: "/checklist", icon: CheckSquare },
-  { label: "Alerts", href: "/alerts", icon: AlertTriangle },
-  { label: "Analytics", href: "/analytics", icon: BarChart3 },
-  { label: "Staff Performance", href: "/staff-performance", icon: Trophy },
-  { label: "Live Map", href: "/live-map", icon: Map },
-  { label: "Reports", href: "/reports", icon: FileText },
-  { label: "Users", href: "/users", icon: Users },
-  { label: "Backend Status", href: "/backend-status", icon: Server },
-  { label: "Audit Logs", href: "/audit-logs", icon: Activity },
-  { label: "Settings", href: "/settings", icon: Settings },
-];
+const iconByLabel = {
+  Dashboard: LayoutDashboard,
+  Applications: AppWindow,
+  Analytics: BarChart3,
+  Dispatch: Radio,
+  "System Health": Server,
+  Organizations: Building2,
+  "Admin Roles": KeyRound,
+  "Audit Logs": Shield,
+  Telemetry: Activity,
+  "Agency Management": Landmark,
+  "Franchise Network": Network,
+  Settings: Settings,
+  Users: Users,
+} as const;
 
 export default function Sidebar() {
   return (
@@ -66,8 +65,8 @@ export default function Sidebar() {
       </div>
 
       <nav className="space-y-1.5 p-4">
-        {navItems.map((item) => {
-          const Icon = item.icon;
+        {SIDEBAR_LINKS.map((item) => {
+          const Icon = iconByLabel[item.label as keyof typeof iconByLabel] ?? Activity;
           return (
             <Link
               key={item.href}
