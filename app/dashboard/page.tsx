@@ -7,6 +7,7 @@ import AlertsCenter from "@/components/AlertsCenter";
 import NotificationCenter from "@/components/NotificationCenter";
 import OperationalChecklist from "@/components/OperationalChecklist";
 import QuickActionsPanel from "@/components/QuickActionsPanel";
+import OperationsTimelinePanel from "@/components/OperationsTimelinePanel";
 import ExecutiveLayout from "@/components/layouts/ExecutiveLayout";
 import CommandHeader from "@/components/CommandHeader";
 
@@ -25,6 +26,8 @@ export default function DashboardPage() {
         <APCCommandMap />
 
         <ActivityFeed />
+
+        <OperationsTimelinePanel />
 
         <AlertsCenter />
 

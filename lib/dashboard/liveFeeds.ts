@@ -1,8 +1,9 @@
 import { APP_CONFIG } from "@/lib/appConfig";
 import { getDataMode, hasSupabaseConfig } from "@/lib/dataMode";
 import { getPlatformHealth } from "@/lib/integrations/platformConnector";
-import { getLiveAuditLog, getLiveNotifications } from "@/lib/events/liveEventEmitter";
+import { getLiveAuditLog, getLiveEvents, getLiveNotifications } from "@/lib/events/liveEventEmitter";
 import { getAuditLogs } from "@/lib/supabase/audit";
+import { getAcknowledgedOperationIds, isOperationAcknowledged } from "@/lib/services/operationsAcks";
 
 export type DashboardActivityItem = {
   id: string;
@@ -23,6 +24,16 @@ export type DashboardNotificationItem = {
   title: string;
   priority: "High" | "Medium" | "Low";
   detail: string;
+};
+
+export type DashboardOperationTimelineItem = {
+  id: string;
+  action: string;
+  actor: string;
+  source: string;
+  timestamp: string;
+  time: string;
+  acknowledged: boolean;
 };
 
 function pluralize(value: number, word: string) {
@@ -194,6 +205,63 @@ export async function getAlertsFeed(limit = 6): Promise<DashboardAlertItem[]> {
       title: "No active critical alerts",
       severity: "Low",
       detail: "Platform connectors and backend configuration are stable.",
+    },
+  ];
+}
+
+export async function getOperationsTimeline(limit = 12): Promise<DashboardOperationTimelineItem[]> {
+  const events = getLiveEvents()
+    .filter((event) => event.type === "audit" || event.type === "notification")
+    .map((event) => ({
+      id: event.id,
+      action: event.type === "notification" ? "notification:emitted" : "audit:event",
+      actor: event.type === "notification" ? "system" : "operator",
+      source: event.source,
+      timestamp: event.timestamp,
+    }));
+
+  const inMemoryAudit = getLiveAuditLog().map((record) => ({
+    id: record.id,
+    action: record.action,
+    actor: record.actor,
+    source: "apc_control_center",
+    timestamp: record.timestamp,
+  }));
+
+  const persistedAudit = await getAuditLogs(Math.max(limit * 2, 20));
+  const persisted = persistedAudit.map((record) => ({
+    id: record.id,
+    action: record.action,
+    actor: record.actor,
+    source: record.source ?? "apc",
+    timestamp: record.timestamp,
+  }));
+
+  const acked = new Set(getAcknowledgedOperationIds());
+
+  const merged = [...events, ...inMemoryAudit, ...persisted]
+    .filter((entry, index, all) => all.findIndex((item) => item.id === entry.id) === index)
+    .sort((a, b) => Date.parse(b.timestamp) - Date.parse(a.timestamp))
+    .slice(0, limit)
+    .map((entry) => ({
+      ...entry,
+      time: formatRelativeTime(entry.timestamp),
+      acknowledged: acked.has(entry.id) || isOperationAcknowledged(entry.id),
+    }));
+
+  if (merged.length > 0) {
+    return merged;
+  }
+
+  return [
+    {
+      id: "operations-demo-1",
+      action: "operations:initialized",
+      actor: "system",
+      source: "apc_control_center",
+      timestamp: new Date().toISOString(),
+      time: "just now",
+      acknowledged: false,
     },
   ];
 }
