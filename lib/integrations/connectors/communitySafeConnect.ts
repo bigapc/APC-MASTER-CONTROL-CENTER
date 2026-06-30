@@ -66,5 +66,5 @@ export async function getCSCHealth(): Promise<PlatformHealth> {
   // CommunitySafeConnect has no GitHub repo yet; derive from Supabase connectivity.
   const supabase = getSupabaseServerClient();
   const isConnected = supabase !== null;
-  return { appId: PLATFORM_ID, status: isConnected ? "healthy" : "healthy", uptime: "99.8%" };
+  return { appId: PLATFORM_ID, status: isConnected ? "healthy" : "monitoring", uptime: isConnected ? "99.8%" : "n/a" };
 }

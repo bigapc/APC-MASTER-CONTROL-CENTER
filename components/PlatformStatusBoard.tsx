@@ -1,4 +1,6 @@
-import { APP_REGISTRY } from "@/lib/appRegistry";
+import { APP_CONFIG } from "@/lib/appConfig";
+import { getRuntimeStatus } from "@/lib/runtimeStatus";
+import { getPlatformHealth } from "@/lib/integrations/platformConnector";
 
 function statusClass(status: string) {
   if (status === "healthy") return "apc-status apc-status-green";
@@ -6,7 +8,25 @@ function statusClass(status: string) {
   return "apc-status apc-status-red";
 }
 
-export default function PlatformStatusBoard() {
+function normalizeStatus(runtimeReady: boolean, connectorStatus?: string) {
+  if (!runtimeReady) {
+    return "offline";
+  }
+
+  if (connectorStatus === "healthy") {
+    return "healthy";
+  }
+
+  if (connectorStatus === "monitoring" || connectorStatus === "warning") {
+    return "monitoring";
+  }
+
+  return "offline";
+}
+
+export default async function PlatformStatusBoard() {
+  const [runtime, health] = await Promise.all([getRuntimeStatus(), getPlatformHealth()]);
+
   return (
     <div className="apc-card p-6">
       <h2 className="text-2xl font-black">
@@ -14,21 +34,31 @@ export default function PlatformStatusBoard() {
       </h2>
 
       <div className="mt-5 grid gap-4 md:grid-cols-3">
-        {APP_REGISTRY.map((app) => (
-          <div
-            key={app.id}
-            className="rounded-xl bg-zinc-50 p-5"
-            style={{ borderLeft: `4px solid ${app.color}` }}
-          >
-            <h3 className="font-black">
-              {app.name}
-            </h3>
+        {APP_CONFIG.apps.map((app) => {
+          const runtimeEntry = runtime.platforms.find((platform) => platform.id === app.id);
+          const healthEntry = health.find((item) => item.appId === app.id);
+          const status = normalizeStatus(Boolean(runtimeEntry?.publicReachable && runtimeEntry?.adminReachable), healthEntry?.status);
 
-            <div className="mt-2">
-              <span className={statusClass(app.status)}>{app.status}</span>
+          return (
+            <div
+              key={app.id}
+              className="rounded-xl bg-zinc-50 p-5"
+              style={{ borderLeft: "4px solid #c1121f" }}
+            >
+              <h3 className="font-black">
+                {app.name}
+              </h3>
+
+              <div className="mt-2">
+                <span className={statusClass(status)}>{status}</span>
+              </div>
+
+              <p className="mt-3 text-xs font-bold text-zinc-600">
+                Reachability: {runtimeEntry?.publicReachable && runtimeEntry?.adminReachable ? "public/admin online" : "pending or unreachable"}
+              </p>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

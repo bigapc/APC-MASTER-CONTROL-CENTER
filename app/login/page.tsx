@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import LoginForm from "./LoginForm";
 
 export default function LoginPage() {
@@ -43,7 +44,9 @@ export default function LoginPage() {
               Authenticate with a demo APC account to continue.
             </p>
 
-            <LoginForm />
+            <Suspense fallback={<p className="mt-6 text-sm text-zinc-300">Loading sign-in form...</p>}>
+              <LoginForm />
+            </Suspense>
           </div>
         </div>
       </div>
