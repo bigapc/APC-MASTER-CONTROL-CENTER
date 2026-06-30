@@ -43,10 +43,16 @@ The app already supports live backend wiring. To connect all platforms, set thes
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `NEXT_PUBLIC_SAFECONNECT_PUBLIC_URL`
 - `NEXT_PUBLIC_SAFECONNECT_ADMIN_URL`
+- `SAFECONNECT_WEBHOOK_SECRET`
+- `SAFECONNECT_SERVICE_TOKEN`
 - `NEXT_PUBLIC_COMMUNITYSAFECONNECT_PUBLIC_URL`
 - `NEXT_PUBLIC_COMMUNITYSAFECONNECT_ADMIN_URL`
+- `COMMUNITYSAFECONNECT_WEBHOOK_SECRET`
+- `COMMUNITYSAFECONNECT_SERVICE_TOKEN`
 - `NEXT_PUBLIC_CSC_2_PUBLIC_URL`
 - `NEXT_PUBLIC_CSC_2_ADMIN_URL`
+- `CSC_2_WEBHOOK_SECRET`
+- `CSC_2_SERVICE_TOKEN`
 
 Optional but recommended:
 
@@ -57,7 +63,53 @@ Optional but recommended:
 - `APC_ENABLE_DEMO_CREDENTIALS=false` to explicitly disable demo credential fallback
 - `APC_PREVIEW_BYPASS_AUTH=true` to temporarily disable login and role checks for preview sessions
 
-Once those values are present, the backend status and control hubs pages will automatically switch from pending placeholders to configured platform links.
+Once those values are present, the backend status, control hubs, settings, and launch-readiness surfaces will treat each app as fully integrated.
+
+For these three APC apps, the intended long-term onboarding model is:
+
+- create or deploy the app independently
+- set its public/admin URLs in APC
+- add its webhook secret and service token to APC
+- let APC consume events, status checks, and oversight data from one master control center
+
+That means you should not need a separate master-center rewrite for each app once SafeConnect, CommunitySafeConnect, and CSC 2.0 are fully built. You will mainly be supplying credentials and endpoint configuration.
+
+## Inbound Webhooks
+
+APC now exposes per-platform webhook intake endpoints so each app can push activity into the master control center:
+
+- `/api/webhooks/safeconnect`
+- `/api/webhooks/communitysafeconnect`
+- `/api/webhooks/csc_2_0`
+
+Each request should include:
+
+- header: `x-apc-webhook-secret: <platform webhook secret>`
+- JSON body with optional fields:
+	- `eventType`
+	- `actor`
+	- `title`
+	- `message`
+	- `level` (`info`, `warning`, `critical`)
+	- `payload`
+
+Example payload:
+
+```json
+{
+	"eventType": "manager.reviewed_case",
+	"actor": "SafeConnect Supervisor",
+	"title": "Supervisor activity received",
+	"message": "Case SC-1042 was reviewed in SafeConnect.",
+	"level": "info",
+	"payload": {
+		"caseId": "SC-1042",
+		"appRole": "supervisor"
+	}
+}
+```
+
+Inbound webhook events are converted into APC audit activity and notifications so they appear in the master control center without custom per-page wiring.
 
 ## Backend Notes
 

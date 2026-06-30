@@ -72,7 +72,7 @@ export default async function BackendStatusPage() {
       <section className="apc-card p-6">
         <h2 className="text-2xl font-black">Platform Connection Matrix</h2>
         <p className="mt-2 text-zinc-600">
-          The APC Control Center uses these links to open each platform’s public and admin surfaces.
+          The APC Control Center uses each platform&apos;s URLs plus integration credentials to monitor and coordinate all three application command centers.
         </p>
         <div className="mt-5 grid gap-4 lg:grid-cols-3">
           {runtime.platforms.map((platform) => (
@@ -83,7 +83,7 @@ export default async function BackendStatusPage() {
                   <h3 className="mt-1 text-xl font-black">{platform.name}</h3>
                 </div>
                 <span className={`rounded-full px-3 py-1 text-xs font-black ${platform.ready ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-800"}`}>
-                  {platform.ready ? "Configured" : "Needs URLs"}
+                  {platform.ready ? "Configured" : "Needs Integration Config"}
                 </span>
               </div>
 

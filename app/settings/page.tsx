@@ -38,7 +38,7 @@ export default async function SettingsPage() {
           <div>
             <h2 className="text-2xl font-black">Live Connection Checklist</h2>
             <p className="mt-1 text-zinc-600">
-              Track backend and platform configuration status before switching operations to live mode.
+              Track backend and per-platform integration status before switching operations to live mode.
             </p>
           </div>
           <span className={`inline-flex rounded-full px-3 py-1 text-xs font-black ${runtime.liveReady ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-800"}`}>
@@ -108,7 +108,7 @@ export default async function SettingsPage() {
                   Missing env: {platform.missingEnvVars.join(", ")}
                 </p>
               ) : (
-                <p className="mt-2 text-xs font-bold text-green-700">Public/Admin URLs configured.</p>
+                <p className="mt-2 text-xs font-bold text-green-700">URLs and integration credentials configured.</p>
               )}
               {platform.ready ? (
                 <p className={`mt-2 text-xs font-bold ${platform.publicReachable && platform.adminReachable ? "text-green-700" : "text-yellow-800"}`}>

@@ -20,10 +20,10 @@ export default async function ControlHubsPage() {
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h2 className="text-2xl font-black">Connection Readiness</h2>
-            <p className="mt-1 text-zinc-600">Live indicators for the platform links the control center uses.</p>
+            <p className="mt-1 text-zinc-600">Live indicators for platform URLs plus webhook and service credentials.</p>
           </div>
           <span className={`inline-flex rounded-full px-3 py-1 text-xs font-black ${runtime.liveReady ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-800"}`}>
-            {runtime.liveReady ? "Ready for live platform connections" : "Platform URLs still need configuration"}
+            {runtime.liveReady ? "Ready for live platform connections" : "Platform integration config still needs completion"}
           </span>
         </div>
 
@@ -94,7 +94,7 @@ export default async function ControlHubsPage() {
                 </>
               ) : (
                 <div className="w-full rounded-xl border border-yellow-200 bg-yellow-50 px-3 py-2 text-xs font-bold text-yellow-900">
-                  Configure platform URLs in env to enable links.
+                  Configure platform URLs, webhook secret, and service token to enable full integration.
                 </div>
               )}
             </div>

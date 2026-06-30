@@ -24,18 +24,29 @@ type EndpointProbeResult = {
   error: string | null;
 };
 
-const PLATFORM_ENV_KEYS: Record<string, { publicUrl: string; adminUrl: string }> = {
+const PLATFORM_ENV_KEYS: Record<string, {
+  publicUrl: string;
+  adminUrl: string;
+  webhookSecret: string;
+  serviceToken: string;
+}> = {
   safeconnect: {
     publicUrl: "NEXT_PUBLIC_SAFECONNECT_PUBLIC_URL",
     adminUrl: "NEXT_PUBLIC_SAFECONNECT_ADMIN_URL",
+    webhookSecret: "SAFECONNECT_WEBHOOK_SECRET",
+    serviceToken: "SAFECONNECT_SERVICE_TOKEN",
   },
   communitysafeconnect: {
     publicUrl: "NEXT_PUBLIC_COMMUNITYSAFECONNECT_PUBLIC_URL",
     adminUrl: "NEXT_PUBLIC_COMMUNITYSAFECONNECT_ADMIN_URL",
+    webhookSecret: "COMMUNITYSAFECONNECT_WEBHOOK_SECRET",
+    serviceToken: "COMMUNITYSAFECONNECT_SERVICE_TOKEN",
   },
   csc_2_0: {
     publicUrl: "NEXT_PUBLIC_CSC_2_PUBLIC_URL",
     adminUrl: "NEXT_PUBLIC_CSC_2_ADMIN_URL",
+    webhookSecret: "CSC_2_WEBHOOK_SECRET",
+    serviceToken: "CSC_2_SERVICE_TOKEN",
   },
 };
 
@@ -108,9 +119,13 @@ export async function getRuntimeStatus() {
     const envKeys = PLATFORM_ENV_KEYS[app.id];
     const hasPublicUrl = isConfiguredUrl(app.publicUrl);
     const hasAdminUrl = isConfiguredUrl(app.adminUrl);
+    const hasWebhookSecret = Boolean(process.env[envKeys?.webhookSecret ?? ""]?.trim());
+    const hasServiceToken = Boolean(process.env[envKeys?.serviceToken ?? ""]?.trim());
     const missingEnvVars = [
       ...(hasPublicUrl ? [] : [envKeys?.publicUrl ?? "NEXT_PUBLIC_PLATFORM_PUBLIC_URL"]),
       ...(hasAdminUrl ? [] : [envKeys?.adminUrl ?? "NEXT_PUBLIC_PLATFORM_ADMIN_URL"]),
+      ...(hasWebhookSecret ? [] : [envKeys?.webhookSecret ?? "PLATFORM_WEBHOOK_SECRET"]),
+      ...(hasServiceToken ? [] : [envKeys?.serviceToken ?? "PLATFORM_SERVICE_TOKEN"]),
     ];
 
     return {
@@ -118,7 +133,7 @@ export async function getRuntimeStatus() {
       name: app.name,
       publicUrl: app.publicUrl,
       adminUrl: app.adminUrl,
-      ready: hasPublicUrl && hasAdminUrl,
+      ready: hasPublicUrl && hasAdminUrl && hasWebhookSecret && hasServiceToken,
       missingEnvVars,
     };
   });
