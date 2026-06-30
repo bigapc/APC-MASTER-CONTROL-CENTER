@@ -1,8 +1,14 @@
 import { Suspense } from "react";
+import { redirect } from "next/navigation";
 import { getDemoCredentials } from "@/lib/auth";
+import { isPreviewBypassEnabled } from "@/lib/security/previewMode";
 import LoginForm from "./LoginForm";
 
 export default function LoginPage() {
+  if (isPreviewBypassEnabled()) {
+    redirect("/dashboard");
+  }
+
   const demoCredentials = getDemoCredentials();
 
   return (

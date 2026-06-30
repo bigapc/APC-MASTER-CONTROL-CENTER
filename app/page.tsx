@@ -1,8 +1,11 @@
 import Link from "next/link";
 import { ArrowRight, ShieldCheck } from "lucide-react";
 import { APP_CONFIG } from "@/lib/appConfig";
+import { isPreviewBypassEnabled } from "@/lib/security/previewMode";
 
 export default function HomePage() {
+  const previewBypass = isPreviewBypassEnabled();
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-zinc-950 to-red-950 px-4 py-8 text-white md:px-8 md:py-12">
       <div className="mx-auto grid w-full max-w-7xl gap-8 lg:grid-cols-[1.1fr_0.9fr]">
@@ -45,8 +48,8 @@ export default function HomePage() {
           </div>
 
           <div className="mt-8 flex flex-col gap-4 sm:flex-row">
-            <Link href="/login" className="apc-button-primary">
-              Enter Control Center <ArrowRight size={18} />
+            <Link href={previewBypass ? "/dashboard" : "/login"} className="apc-button-primary">
+              {previewBypass ? "Open Dashboard" : "Enter Control Center"} <ArrowRight size={18} />
             </Link>
 
             <div className="inline-flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm text-zinc-200">
