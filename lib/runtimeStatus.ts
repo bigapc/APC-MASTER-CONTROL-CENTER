@@ -8,6 +8,20 @@ export type PlatformRuntimeStatus = {
   adminUrl: string;
   ready: boolean;
   missingEnvVars: string[];
+  publicReachable: boolean;
+  adminReachable: boolean;
+  publicStatusCode: number | null;
+  adminStatusCode: number | null;
+  publicLatencyMs: number | null;
+  adminLatencyMs: number | null;
+  probeError: string | null;
+};
+
+type EndpointProbeResult = {
+  reachable: boolean;
+  statusCode: number | null;
+  latencyMs: number | null;
+  error: string | null;
 };
 
 const PLATFORM_ENV_KEYS: Record<string, { publicUrl: string; adminUrl: string }> = {
@@ -34,6 +48,51 @@ function isConfiguredUrl(value: string) {
   return trimmed.startsWith("http://") || trimmed.startsWith("https://");
 }
 
+async function probeUrl(url: string): Promise<EndpointProbeResult> {
+  const controller = new AbortController();
+  const startedAt = Date.now();
+  const timeout = setTimeout(() => controller.abort(), 2500);
+
+  try {
+    const response = await fetch(url, {
+      method: "HEAD",
+      cache: "no-store",
+      signal: controller.signal,
+    });
+
+    return {
+      reachable: response.ok,
+      statusCode: response.status,
+      latencyMs: Date.now() - startedAt,
+      error: null,
+    };
+  } catch (error) {
+    return {
+      reachable: false,
+      statusCode: null,
+      latencyMs: Date.now() - startedAt,
+      error: error instanceof Error ? error.message : "Connection failed",
+    };
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+async function probeSupabase(url: string | undefined): Promise<EndpointProbeResult> {
+  const baseUrl = url?.trim();
+
+  if (!baseUrl) {
+    return {
+      reachable: false,
+      statusCode: null,
+      latencyMs: null,
+      error: "NEXT_PUBLIC_SUPABASE_URL is not configured",
+    };
+  }
+
+  return probeUrl(`${baseUrl}/auth/v1/health`);
+}
+
 export async function getRuntimeStatus() {
   const supabaseUrlConfigured = Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL?.trim());
   const supabaseAnonConfigured = Boolean(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim());
@@ -45,7 +104,7 @@ export async function getRuntimeStatus() {
     ...(supabaseServiceRoleConfigured ? [] : ["SUPABASE_SERVICE_ROLE_KEY"]),
   ];
 
-  const platforms = APP_CONFIG.apps.map((app) => {
+  const platformsBase = APP_CONFIG.apps.map((app) => {
     const envKeys = PLATFORM_ENV_KEYS[app.id];
     const hasPublicUrl = isConfiguredUrl(app.publicUrl);
     const hasAdminUrl = isConfiguredUrl(app.adminUrl);
@@ -61,8 +120,53 @@ export async function getRuntimeStatus() {
       adminUrl: app.adminUrl,
       ready: hasPublicUrl && hasAdminUrl,
       missingEnvVars,
-    } satisfies PlatformRuntimeStatus;
+    };
   });
+
+  const shouldProbeConnectivity = isLiveMode();
+
+  const [backendProbe, platforms] = await Promise.all([
+    shouldProbeConnectivity ? probeSupabase(process.env.NEXT_PUBLIC_SUPABASE_URL) : Promise.resolve({
+      reachable: false,
+      statusCode: null,
+      latencyMs: null,
+      error: "Connectivity probes run in live mode only",
+    }),
+    Promise.all(platformsBase.map(async (platform) => {
+      if (!shouldProbeConnectivity || !platform.ready) {
+        return {
+          ...platform,
+          publicReachable: false,
+          adminReachable: false,
+          publicStatusCode: null,
+          adminStatusCode: null,
+          publicLatencyMs: null,
+          adminLatencyMs: null,
+          probeError: !shouldProbeConnectivity
+            ? "Connectivity probes run in live mode only"
+            : "Platform URL is not configured",
+        } satisfies PlatformRuntimeStatus;
+      }
+
+      const [publicProbe, adminProbe] = await Promise.all([
+        probeUrl(platform.publicUrl),
+        probeUrl(platform.adminUrl),
+      ]);
+
+      return {
+        ...platform,
+        publicReachable: publicProbe.reachable,
+        adminReachable: adminProbe.reachable,
+        publicStatusCode: publicProbe.statusCode,
+        adminStatusCode: adminProbe.statusCode,
+        publicLatencyMs: publicProbe.latencyMs,
+        adminLatencyMs: adminProbe.latencyMs,
+        probeError: publicProbe.error || adminProbe.error,
+      } satisfies PlatformRuntimeStatus;
+    })),
+  ]);
+
+  const platformsReachable = platforms.every((platform) => platform.publicReachable && platform.adminReachable);
 
   return {
     mode: getDataMode(),
@@ -76,9 +180,14 @@ export async function getRuntimeStatus() {
     supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL || "Not configured",
     ownerName: APP_CONFIG.ownerName,
     ownerEmail: APP_CONFIG.ownerEmail,
+    backendReachable: backendProbe.reachable,
+    backendStatusCode: backendProbe.statusCode,
+    backendLatencyMs: backendProbe.latencyMs,
+    backendProbeError: backendProbe.error,
     platforms,
     platformsConfigured: platforms.every((platform) => platform.ready),
+    platformsReachable,
     platformCount: platforms.length,
-    liveReady: isLiveMode() && hasSupabaseConfig() && platforms.every((platform) => platform.ready),
+    liveReady: isLiveMode() && hasSupabaseConfig() && platforms.every((platform) => platform.ready) && backendProbe.reachable && platformsReachable,
   };
 }

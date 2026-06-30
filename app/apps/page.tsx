@@ -16,7 +16,10 @@ export default async function AppsPage() {
       </section>
 
       <section className="grid gap-6 lg:grid-cols-3">
-        {APP_CONFIG.apps.map((app) => (
+        {APP_CONFIG.apps.map((app) => {
+          const platform = runtime.platforms.find((entry) => entry.id === app.id);
+
+          return (
           <div key={app.id} className="apc-card p-6">
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-zinc-950 text-white">
               <ShieldCheck size={24} />
@@ -38,9 +41,15 @@ export default async function AppsPage() {
               <div className="rounded-2xl bg-zinc-50 p-4">
                 <p className="text-xs font-black uppercase text-zinc-500">Connection</p>
                 <p className="mt-1 font-bold text-zinc-900">
-                  {runtime.platforms.find((platform) => platform.id === app.id)?.ready
+                  {platform?.ready
                     ? "Configured"
                     : "Pending"}
+                </p>
+              </div>
+              <div className="rounded-2xl bg-zinc-50 p-4">
+                <p className="text-xs font-black uppercase text-zinc-500">Reachability</p>
+                <p className={`mt-1 font-bold ${platform?.publicReachable && platform?.adminReachable ? "text-green-700" : "text-yellow-800"}`}>
+                  {platform?.publicReachable && platform?.adminReachable ? "Reachable" : "Not reachable"}
                 </p>
               </div>
               <div className="rounded-2xl bg-zinc-50 p-4">
@@ -50,7 +59,7 @@ export default async function AppsPage() {
             </div>
 
             <div className="mt-6 flex gap-3">
-              {runtime.platforms.find((platform) => platform.id === app.id)?.ready ? (
+              {platform?.ready ? (
                 <>
                   <a href={app.adminUrl} className="apc-button-primary flex-1">
                     <ExternalLink size={16} /> Admin
@@ -61,12 +70,19 @@ export default async function AppsPage() {
                 </>
               ) : (
                 <p className="w-full rounded-xl border border-yellow-200 bg-yellow-50 px-3 py-2 text-xs font-bold text-yellow-900">
-                  Missing env: {runtime.platforms.find((platform) => platform.id === app.id)?.missingEnvVars.join(", ")}
+                  Missing env: {platform?.missingEnvVars.join(", ")}
                 </p>
               )}
             </div>
+
+            {platform?.ready ? (
+              <p className="mt-3 text-xs font-bold text-zinc-600">
+                Probe status: public {platform.publicStatusCode ?? "n/a"}, admin {platform.adminStatusCode ?? "n/a"}
+              </p>
+            ) : null}
           </div>
-        ))}
+        );
+        })}
       </section>
 
       <section className="apc-card p-6">

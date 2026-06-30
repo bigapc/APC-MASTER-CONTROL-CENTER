@@ -44,10 +44,20 @@ export default async function ControlHubsPage() {
                 <div className="rounded-xl bg-white p-4">
                   <p className="text-xs font-black uppercase text-zinc-500">Public URL</p>
                   <p className="mt-1 break-all font-mono text-zinc-900">{platform.publicUrl}</p>
+                  <p className={`mt-2 text-xs font-bold ${platform.publicReachable ? "text-green-700" : "text-yellow-800"}`}>
+                    {platform.publicReachable
+                      ? `Reachable (${platform.publicStatusCode ?? "n/a"})`
+                      : "Not reachable"}
+                  </p>
                 </div>
                 <div className="rounded-xl bg-white p-4">
                   <p className="text-xs font-black uppercase text-zinc-500">Admin URL</p>
                   <p className="mt-1 break-all font-mono text-zinc-900">{platform.adminUrl}</p>
+                  <p className={`mt-2 text-xs font-bold ${platform.adminReachable ? "text-green-700" : "text-yellow-800"}`}>
+                    {platform.adminReachable
+                      ? `Reachable (${platform.adminStatusCode ?? "n/a"})`
+                      : "Not reachable"}
+                  </p>
                 </div>
               </div>
 
@@ -55,6 +65,8 @@ export default async function ControlHubsPage() {
                 <p className="mt-3 text-xs font-bold text-yellow-800">
                   Missing env: {platform.missingEnvVars.join(", ")}
                 </p>
+              ) : platform.probeError ? (
+                <p className="mt-3 text-xs font-bold text-zinc-600">Probe note: {platform.probeError}</p>
               ) : null}
             </div>
           ))}

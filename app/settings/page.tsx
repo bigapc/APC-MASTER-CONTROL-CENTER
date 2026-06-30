@@ -68,6 +68,30 @@ export default async function SettingsPage() {
               <p className="mt-2 text-sm font-bold text-green-700">Supabase live credentials detected.</p>
             )}
           </div>
+
+          <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-5">
+            <p className="text-xs font-black uppercase tracking-wide text-zinc-500">Backend Reachability</p>
+            <p className={`mt-2 text-lg font-black ${runtime.backendReachable ? "text-green-700" : "text-yellow-800"}`}>
+              {runtime.backendReachable ? "Reachable" : "Not reachable"}
+            </p>
+            <p className="mt-2 text-sm font-bold text-zinc-700">
+              HTTP status: {runtime.backendStatusCode ?? "Not checked"}
+              {runtime.backendLatencyMs !== null ? ` (${runtime.backendLatencyMs} ms)` : ""}
+            </p>
+            {runtime.backendProbeError ? (
+              <p className="mt-2 text-xs font-bold text-zinc-600">Probe note: {runtime.backendProbeError}</p>
+            ) : null}
+          </div>
+
+          <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-5">
+            <p className="text-xs font-black uppercase tracking-wide text-zinc-500">Platform Reachability</p>
+            <p className={`mt-2 text-lg font-black ${runtime.platformsReachable ? "text-green-700" : "text-yellow-800"}`}>
+              {runtime.platformsReachable ? "All reachable" : "One or more unreachable"}
+            </p>
+            <p className="mt-2 text-sm font-bold text-zinc-700">
+              Reachable endpoints: {runtime.platforms.filter((platform) => platform.publicReachable && platform.adminReachable).length}/{runtime.platformCount}
+            </p>
+          </div>
         </div>
 
         <div className="mt-5 grid gap-4 lg:grid-cols-3">
@@ -86,6 +110,11 @@ export default async function SettingsPage() {
               ) : (
                 <p className="mt-2 text-xs font-bold text-green-700">Public/Admin URLs configured.</p>
               )}
+              {platform.ready ? (
+                <p className={`mt-2 text-xs font-bold ${platform.publicReachable && platform.adminReachable ? "text-green-700" : "text-yellow-800"}`}>
+                  Probe: public {platform.publicStatusCode ?? "n/a"}, admin {platform.adminStatusCode ?? "n/a"}
+                </p>
+              ) : null}
             </div>
           ))}
         </div>

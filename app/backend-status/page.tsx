@@ -41,6 +41,35 @@ export default async function BackendStatusPage() {
       </section>
 
       <section className="apc-card p-6">
+        <h2 className="text-2xl font-black">Backend Reachability Probe</h2>
+        <p className="mt-2 text-zinc-600">
+          APC sends a direct health probe to Supabase when live mode is enabled.
+        </p>
+        <div className="mt-4 grid gap-4 md:grid-cols-4">
+          <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-4">
+            <p className="text-xs font-black uppercase text-zinc-500">Reachable</p>
+            <p className={`mt-1 text-sm font-black ${runtime.backendReachable ? "text-green-700" : "text-yellow-800"}`}>
+              {runtime.backendReachable ? "Yes" : "No"}
+            </p>
+          </div>
+          <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-4">
+            <p className="text-xs font-black uppercase text-zinc-500">HTTP Status</p>
+            <p className="mt-1 text-sm font-black text-zinc-900">{runtime.backendStatusCode ?? "Not checked"}</p>
+          </div>
+          <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-4">
+            <p className="text-xs font-black uppercase text-zinc-500">Latency</p>
+            <p className="mt-1 text-sm font-black text-zinc-900">
+              {runtime.backendLatencyMs !== null ? `${runtime.backendLatencyMs} ms` : "Not checked"}
+            </p>
+          </div>
+          <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-4">
+            <p className="text-xs font-black uppercase text-zinc-500">Probe Error</p>
+            <p className="mt-1 text-sm font-black text-zinc-900">{runtime.backendProbeError ?? "None"}</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="apc-card p-6">
         <h2 className="text-2xl font-black">Platform Connection Matrix</h2>
         <p className="mt-2 text-zinc-600">
           The APC Control Center uses these links to open each platform’s public and admin surfaces.
@@ -58,6 +87,15 @@ export default async function BackendStatusPage() {
                 </span>
               </div>
 
+              <div className="mt-3 grid gap-2 text-xs font-bold sm:grid-cols-2">
+                <p className={`${platform.publicReachable ? "text-green-700" : "text-yellow-800"}`}>
+                  Public: {platform.publicReachable ? "Reachable" : "Not reachable"}
+                </p>
+                <p className={`${platform.adminReachable ? "text-green-700" : "text-yellow-800"}`}>
+                  Admin: {platform.adminReachable ? "Reachable" : "Not reachable"}
+                </p>
+              </div>
+
               <div className="mt-4 space-y-3 text-sm">
                 <div className="rounded-xl bg-white p-4">
                   <p className="text-xs font-black uppercase text-zinc-500">Public URL</p>
@@ -68,6 +106,19 @@ export default async function BackendStatusPage() {
                   <p className="mt-1 break-all font-mono text-zinc-900">{platform.adminUrl}</p>
                 </div>
               </div>
+
+              {platform.ready ? (
+                <p className="mt-2 text-xs font-bold text-zinc-600">
+                  Probe status: public {platform.publicStatusCode ?? "n/a"}, admin {platform.adminStatusCode ?? "n/a"}
+                  {platform.publicLatencyMs !== null && platform.adminLatencyMs !== null
+                    ? ` (${platform.publicLatencyMs} ms / ${platform.adminLatencyMs} ms)`
+                    : ""}
+                </p>
+              ) : null}
+
+              {platform.probeError ? (
+                <p className="mt-2 text-xs font-bold text-zinc-600">Probe note: {platform.probeError}</p>
+              ) : null}
 
               <div className="mt-4 flex gap-3">
                 {platform.ready ? (
