@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getNotificationFeed } from "@/lib/dashboard/liveFeeds";
+import { getAlertsFeed } from "@/lib/dashboard/liveFeeds";
 import { withCors } from "@/lib/security/apiHelpers";
 
 export async function OPTIONS(request: Request) {
@@ -7,10 +7,10 @@ export async function OPTIONS(request: Request) {
 }
 
 export async function GET(request: Request) {
-  const notifications = getNotificationFeed(25);
+  const alerts = await getAlertsFeed(25);
 
   return withCors(
-    NextResponse.json({ notifications, count: notifications.length }),
+    NextResponse.json({ alerts, count: alerts.length }),
     request.headers.get("origin")
   );
 }

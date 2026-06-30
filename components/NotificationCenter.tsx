@@ -1,4 +1,4 @@
-import { notificationCenterItems } from "@/lib/demoData";
+import { getNotificationFeed } from "@/lib/dashboard/liveFeeds";
 
 function priorityClass(priority: string) {
   if (priority === "High") return "apc-status apc-status-red";
@@ -7,6 +7,8 @@ function priorityClass(priority: string) {
 }
 
 export default function NotificationCenter() {
+  const notificationCenterItems = getNotificationFeed(5);
+
   return (
     <div className="apc-card p-6">
       <h2 className="text-2xl font-black">
@@ -26,7 +28,7 @@ export default function NotificationCenter() {
               </span>
             </div>
 
-            <p className="mt-1 text-sm text-zinc-500">Priority signal active</p>
+            <p className="mt-1 text-sm text-zinc-500">{notification.detail}</p>
           </div>
         ))}
       </div>

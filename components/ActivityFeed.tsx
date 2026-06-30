@@ -1,7 +1,9 @@
 import { Activity } from "lucide-react";
-import { activityFeedItems } from "@/lib/demoData";
+import { getActivityFeed } from "@/lib/dashboard/liveFeeds";
 
-export default function ActivityFeed() {
+export default async function ActivityFeed() {
+  const activityFeedItems = await getActivityFeed(5);
+
   return (
     <div className="apc-card p-6">
       <div className="flex items-center gap-3">
@@ -11,7 +13,7 @@ export default function ActivityFeed() {
 
       <div className="mt-5 space-y-3">
         {activityFeedItems.map((item) => (
-          <div key={item.title} className="rounded-xl bg-zinc-50 p-4">
+          <div key={item.id} className="rounded-xl bg-zinc-50 p-4">
             <p className="font-black">{item.title}</p>
             <p className="mt-1 text-sm text-zinc-600">{item.detail}</p>
             <p className="mt-2 text-xs font-bold uppercase tracking-wide text-zinc-400">
