@@ -10,6 +10,18 @@ APC Master Control Center is the executive operations dashboard for Armstrong Pa
 - Demo data mode and live Supabase mode
 - Platform readiness indicators for SafeConnect, CommunitySafeConnect, and CSC 2.0
 
+## Master Platform Scope
+
+The APC master platform is being tightened around these core capability domains:
+
+- Live command maps
+- GPS tracking
+- Alerts and escalation command
+- Historical school data access
+- Financial data and analytics
+
+These capabilities are tracked in the shared registry used by frontend and backend at `lib/config/masterPlatformCapabilities.ts` and exposed via `GET /api/platform-capabilities`.
+
 ## Local Development
 
 1. Install dependencies.
@@ -53,6 +65,16 @@ The app already supports live backend wiring. To connect all platforms, set thes
 - `NEXT_PUBLIC_CSC_2_ADMIN_URL`
 - `CSC_2_WEBHOOK_SECRET`
 - `CSC_2_SERVICE_TOKEN`
+
+Capability readiness connector variables:
+
+- `APC_MAP_PROVIDER_URL`
+- `APC_GPS_STREAM_URL`
+- `APC_GPS_STREAM_TOKEN`
+- `APC_SCHOOL_DATA_SOURCE_URL`
+- `APC_SCHOOL_DATA_ACCESS_TOKEN`
+- `APC_FINANCE_DATA_SOURCE_URL`
+- `APC_FINANCE_DATA_ACCESS_TOKEN`
 
 Optional but recommended:
 

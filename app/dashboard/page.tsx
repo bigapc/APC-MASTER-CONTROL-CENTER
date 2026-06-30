@@ -10,6 +10,7 @@ import QuickActionsPanel from "@/components/QuickActionsPanel";
 import OperationsTimelinePanel from "@/components/OperationsTimelinePanel";
 import ExecutiveLayout from "@/components/layouts/ExecutiveLayout";
 import CommandHeader from "@/components/CommandHeader";
+import MasterPlatformScope from "@/components/MasterPlatformScope";
 
 export default function DashboardPage() {
   return (
@@ -18,6 +19,8 @@ export default function DashboardPage() {
 
       <div className="space-y-8">
         <CommandCenterHero />
+
+        <MasterPlatformScope />
 
         <ExecutiveMetrics />
 
