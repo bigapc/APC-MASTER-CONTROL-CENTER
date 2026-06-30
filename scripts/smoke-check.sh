@@ -152,6 +152,7 @@ check_protected_api "/api/platforms"
 check_protected_api "/api/alerts"
 check_protected_api "/api/notifications"
 check_protected_api "/api/command-status"
+check_protected_api "/api/launch-readiness"
 
 if [[ "$failures" -gt 0 ]]; then
   echo "[smoke] FAIL: ${failures} check(s) failed"
