@@ -91,7 +91,7 @@ export default async function TelemetryPage({
   ]);
 
   const mergedEvents = mergeAndSortEvents(inMemoryEvents, persistedEvents);
-  const cutoff = Date.now() - getWindowMs(selectedWindow);
+  const cutoff = new Date().getTime() - getWindowMs(selectedWindow);
 
   const filteredEvents = mergedEvents
     .filter((event) => Date.parse(event.timestamp) >= cutoff)

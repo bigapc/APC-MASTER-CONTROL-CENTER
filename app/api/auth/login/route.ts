@@ -5,6 +5,7 @@ import {
   createSessionValue,
   validateCredentials,
 } from "@/lib/auth";
+import { supabaseSignIn } from "@/lib/supabase/auth";
 import { checkRateLimit, retryAfterSeconds } from "@/lib/security/rateLimit";
 import { getClientIp, methodNotAllowed, withCors } from "@/lib/security/apiHelpers";
 
@@ -40,7 +41,8 @@ export async function POST(request: Request) {
   const email = body?.email?.trim() ?? "";
   const password = body?.password ?? "";
 
-  const user = validateCredentials(email, password);
+  const liveUser = await supabaseSignIn(email, password);
+  const user = liveUser ?? validateCredentials(email, password);
 
   if (!user) {
     return withCors(

@@ -43,7 +43,9 @@ export default function LiveAuditFeed({ limit = 20 }: { limit?: number }) {
   }
 
   useEffect(() => {
-    fetchLogs();
+    queueMicrotask(() => {
+      void fetchLogs();
+    });
     const timer = setInterval(fetchLogs, POLL_INTERVAL_MS);
     return () => clearInterval(timer);
   // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -22,20 +22,16 @@ function isPublicPath(pathname: string) {
 
 export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
+  const sessionValue = request.cookies.get(SESSION_COOKIE)?.value;
+  const user = await getUserFromSessionValue(sessionValue);
 
   if (isPublicPath(pathname)) {
-    const sessionValue = request.cookies.get(SESSION_COOKIE)?.value;
-    const user = await getUserFromSessionValue(sessionValue);
-
     if (pathname === "/login" && user) {
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
 
     return NextResponse.next();
   }
-
-  const sessionValue = request.cookies.get(SESSION_COOKIE)?.value;
-  const user = await getUserFromSessionValue(sessionValue);
 
   if (!user) {
     const loginUrl = new URL("/login", request.url);

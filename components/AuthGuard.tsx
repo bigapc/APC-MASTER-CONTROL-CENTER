@@ -1,16 +1,18 @@
-import { mockSession } from "@/lib/session/session";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { SESSION_COOKIE, getUserFromSessionValue } from "@/lib/auth";
 
-export default function AuthGuard({
+export default async function AuthGuard({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  if (!mockSession) {
-    return (
-      <div className="p-10">
-        Authentication Required
-      </div>
-    );
+  const cookieStore = await cookies();
+  const sessionValue = cookieStore.get(SESSION_COOKIE)?.value;
+  const user = await getUserFromSessionValue(sessionValue);
+
+  if (!user) {
+    redirect("/login");
   }
 
   return <>{children}</>;

@@ -1,6 +1,6 @@
 import { APP_CONFIG, SAFECONNECT_TEST_ACCOUNTS } from "@/lib/appConfig";
 import { getRuntimeStatus } from "@/lib/runtimeStatus";
-import { Database, Server, ShieldCheck, UserCheck, Wifi } from "lucide-react";
+import { ExternalLink, Database, Server, ShieldCheck, UserCheck, Wifi } from "lucide-react";
 
 export default async function BackendStatusPage() {
   const runtime = await getRuntimeStatus();
@@ -30,6 +30,64 @@ export default async function BackendStatusPage() {
         <div className="apc-card p-6"><Database className="text-[#c1121f]" /><p className="mt-4 text-sm font-bold text-zinc-500">Supabase URL</p><p className="mt-3 break-all font-mono text-sm font-black">{supabaseUrl}</p></div>
         <div className="apc-card p-6"><Server className="text-[#c1121f]" /><p className="mt-4 text-sm font-bold text-zinc-500">Project Ref</p><p className="mt-3 break-all font-mono text-sm font-black">{projectRef}</p></div>
         <div className="apc-card p-6"><ShieldCheck className="text-[#c1121f]" /><p className="mt-4 text-sm font-bold text-zinc-500">Control Center</p><p className="mt-3 text-xl font-black">{APP_CONFIG.appName}</p></div>
+        <div className="apc-card p-6 md:col-span-2 xl:col-span-1">
+          <ShieldCheck className="text-[#c1121f]" />
+          <p className="mt-4 text-sm font-bold text-zinc-500">Platform Readiness</p>
+          <p className="mt-3 text-xl font-black">{runtime.liveReady ? "Ready" : "Pending"}</p>
+          <p className="mt-1 text-sm font-bold text-zinc-500">
+            {runtime.platformsConfigured ? "All platform endpoints are configured." : "One or more platform URLs still need env configuration."}
+          </p>
+        </div>
+      </section>
+
+      <section className="apc-card p-6">
+        <h2 className="text-2xl font-black">Platform Connection Matrix</h2>
+        <p className="mt-2 text-zinc-600">
+          The APC Control Center uses these links to open each platform’s public and admin surfaces.
+        </p>
+        <div className="mt-5 grid gap-4 lg:grid-cols-3">
+          {runtime.platforms.map((platform) => (
+            <div key={platform.id} className="rounded-2xl border border-zinc-200 bg-zinc-50 p-5">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-wide text-[#c1121f]">{platform.id}</p>
+                  <h3 className="mt-1 text-xl font-black">{platform.name}</h3>
+                </div>
+                <span className={`rounded-full px-3 py-1 text-xs font-black ${platform.ready ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-800"}`}>
+                  {platform.ready ? "Configured" : "Needs URLs"}
+                </span>
+              </div>
+
+              <div className="mt-4 space-y-3 text-sm">
+                <div className="rounded-xl bg-white p-4">
+                  <p className="text-xs font-black uppercase text-zinc-500">Public URL</p>
+                  <p className="mt-1 break-all font-mono text-zinc-900">{platform.publicUrl}</p>
+                </div>
+                <div className="rounded-xl bg-white p-4">
+                  <p className="text-xs font-black uppercase text-zinc-500">Admin URL</p>
+                  <p className="mt-1 break-all font-mono text-zinc-900">{platform.adminUrl}</p>
+                </div>
+              </div>
+
+              <div className="mt-4 flex gap-3">
+                {platform.ready ? (
+                  <>
+                    <a href={platform.adminUrl} className="apc-button-primary flex-1">
+                      <ExternalLink size={16} /> Admin
+                    </a>
+                    <a href={platform.publicUrl} className="apc-button-secondary flex-1">
+                      <ExternalLink size={16} /> Public
+                    </a>
+                  </>
+                ) : (
+                  <div className="w-full rounded-xl border border-yellow-200 bg-yellow-50 px-3 py-2 text-xs font-bold text-yellow-900">
+                    Missing env: {platform.missingEnvVars.join(", ")}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
       </section>
 
       <section className="apc-card p-6">

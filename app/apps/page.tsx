@@ -1,7 +1,10 @@
 import { APP_CONFIG } from "@/lib/appConfig";
+import { getRuntimeStatus } from "@/lib/runtimeStatus";
 import { ExternalLink, ShieldCheck } from "lucide-react";
 
-export default function AppsPage() {
+export default async function AppsPage() {
+  const runtime = await getRuntimeStatus();
+
   return (
     <div className="space-y-8">
       <section className="apc-card-dark p-8">
@@ -33,18 +36,34 @@ export default function AppsPage() {
                 <p className="mt-1 font-bold text-green-700">{app.health}</p>
               </div>
               <div className="rounded-2xl bg-zinc-50 p-4">
+                <p className="text-xs font-black uppercase text-zinc-500">Connection</p>
+                <p className="mt-1 font-bold text-zinc-900">
+                  {runtime.platforms.find((platform) => platform.id === app.id)?.ready
+                    ? "Configured"
+                    : "Pending"}
+                </p>
+              </div>
+              <div className="rounded-2xl bg-zinc-50 p-4">
                 <p className="text-xs font-black uppercase text-zinc-500">Division Focus</p>
                 <p className="mt-1 font-bold text-zinc-900">{app.accent}</p>
               </div>
             </div>
 
             <div className="mt-6 flex gap-3">
-              <a href={app.adminUrl} className="apc-button-primary flex-1">
-                <ExternalLink size={16} /> Admin
-              </a>
-              <a href={app.publicUrl} className="apc-button-secondary flex-1">
-                <ExternalLink size={16} /> Public
-              </a>
+              {runtime.platforms.find((platform) => platform.id === app.id)?.ready ? (
+                <>
+                  <a href={app.adminUrl} className="apc-button-primary flex-1">
+                    <ExternalLink size={16} /> Admin
+                  </a>
+                  <a href={app.publicUrl} className="apc-button-secondary flex-1">
+                    <ExternalLink size={16} /> Public
+                  </a>
+                </>
+              ) : (
+                <p className="w-full rounded-xl border border-yellow-200 bg-yellow-50 px-3 py-2 text-xs font-bold text-yellow-900">
+                  Missing env: {runtime.platforms.find((platform) => platform.id === app.id)?.missingEnvVars.join(", ")}
+                </p>
+              )}
             </div>
           </div>
         ))}

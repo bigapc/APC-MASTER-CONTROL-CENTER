@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { SESSION_COOKIE } from "@/lib/auth";
+import { supabaseSignOut } from "@/lib/supabase/auth";
 import { methodNotAllowed, withCors } from "@/lib/security/apiHelpers";
 
 export async function GET() {
@@ -11,6 +12,8 @@ export async function OPTIONS(request: Request) {
 }
 
 export async function POST(request: Request) {
+  await supabaseSignOut();
+
   const response = NextResponse.json({ success: true });
   response.cookies.set(SESSION_COOKIE, "", {
     httpOnly: true,

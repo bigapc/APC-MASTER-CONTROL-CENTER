@@ -1,3 +1,6 @@
+import { APP_REGISTRY } from "@/lib/appRegistry";
+import type { CurrentUser } from "@/lib/auth";
+
 export interface APCSession {
   userId: string;
   email: string;
@@ -5,16 +8,14 @@ export interface APCSession {
   appAccess: string[];
 }
 
-export const mockSession: APCSession = {
-  userId: "apc-owner",
-
-  email: "owner@apc.local",
-
-  role: "super_admin",
-
-  appAccess: [
-    "safeconnect",
-    "communitysafeconnect",
-    "csc_2_0",
-  ],
-};
+export function createSessionProfile(user: CurrentUser): APCSession {
+  return {
+    userId: user.id,
+    email: user.email,
+    role: user.role,
+    appAccess:
+      user.role === "super_admin"
+        ? APP_REGISTRY.map((app) => app.id)
+        : [],
+  };
+}

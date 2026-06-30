@@ -4,7 +4,6 @@ import {
   Radio,
   Shield,
   UserCheck,
-  Users,
 } from "lucide-react";
 import { APC_COMMAND } from "@/lib/apcCommandCenter";
 import DataSourceBadge from "@/components/DataSourceBadge";

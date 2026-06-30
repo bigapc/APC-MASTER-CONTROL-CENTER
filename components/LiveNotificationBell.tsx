@@ -48,7 +48,9 @@ export default function LiveNotificationBell() {
   }
 
   useEffect(() => {
-    fetchNotifications();
+    queueMicrotask(() => {
+      void fetchNotifications();
+    });
     const timer = setInterval(fetchNotifications, POLL_INTERVAL_MS);
     return () => clearInterval(timer);
   // eslint-disable-next-line react-hooks/exhaustive-deps

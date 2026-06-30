@@ -1,36 +1,66 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# APC Master Control Center
 
-## Getting Started
+APC Master Control Center is the executive operations dashboard for Armstrong Pack Company. It provides a single control surface for SafeConnect, CommunitySafeConnect, and CommunitySafeConnect-CSC-2.0 with demo/live runtime switching, signed session auth, and platform readiness tracking.
 
-First, run the development server:
+## What It Includes
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Signed login session flow with protected routes
+- APC landing page, login page, and executive dashboard
+- Backend status and control hub pages for platform connection tracking
+- Demo data mode and live Supabase mode
+- Platform readiness indicators for SafeConnect, CommunitySafeConnect, and CSC 2.0
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Local Development
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Install dependencies.
+2. Run the dev server with `npm run dev`.
+3. Open `http://localhost:3000`.
+4. Sign in with the demo credentials shown on the login page.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Live Platform Connection
 
-## Learn More
+The app already supports live backend wiring. To connect all platforms, set these environment variables in `.env.local`:
 
-To learn more about Next.js, take a look at the following resources:
+- `NEXT_PUBLIC_DATA_MODE=live`
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `NEXT_PUBLIC_SAFECONNECT_PUBLIC_URL`
+- `NEXT_PUBLIC_SAFECONNECT_ADMIN_URL`
+- `NEXT_PUBLIC_COMMUNITYSAFECONNECT_PUBLIC_URL`
+- `NEXT_PUBLIC_COMMUNITYSAFECONNECT_ADMIN_URL`
+- `NEXT_PUBLIC_CSC_2_PUBLIC_URL`
+- `NEXT_PUBLIC_CSC_2_ADMIN_URL`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Optional but recommended:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `GITHUB_TOKEN` for live GitHub status data
+- `APC_SESSION_SECRET` for production session signing
 
-## Deploy on Vercel
+Once those values are present, the backend status and control hubs pages will automatically switch from pending placeholders to configured platform links.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Backend Notes
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Supabase reads are handled through the shared helpers in `lib/supabase/*`.
+- The app falls back to demo data when live keys are missing.
+- The login flow uses APC session cookies and redirects unauthenticated users to `/login`.
+
+## Useful Pages
+
+- `/` for the landing page
+- `/login` for authentication
+- `/dashboard` for the command center
+- `/backend-status` for live backend readiness
+- `/control-hubs` for platform connection links
+- `/apps` for the connected platform registry
+
+## Demo Credentials
+
+The login screen exposes demo credentials for local use.
+
+- `owner@apc.local` / `apc_owner_2026`
+- `dispatcher@apc.local` / `dispatch_2026`
+
+## Notes
+
+This project is intentionally safe to run in demo mode. Live mode only becomes active when the required Supabase and platform URL environment variables are present.

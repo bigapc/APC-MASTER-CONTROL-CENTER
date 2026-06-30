@@ -436,21 +436,6 @@ async function withDemoFallbackSource<T>(
   }
 }
 
-async function withDemoFallback<T>(
-  demoData: T,
-  liveResolver?: () => Promise<T>
-): Promise<T> {
-  if (!liveResolver || !canUseLiveMode()) {
-    return demoData;
-  }
-
-  try {
-    return await liveResolver();
-  } catch {
-    return demoData;
-  }
-}
-
 export async function getApplicationsWithSource(): Promise<SourcedData<ApplicationSummary[]>> {
   return withDemoFallbackSource(
     "applications",
