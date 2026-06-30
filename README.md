@@ -84,7 +84,11 @@ APC now exposes per-platform webhook intake endpoints so each app can push activ
 
 Each request should include:
 
-- header: `x-apc-webhook-secret: <platform webhook secret>`
+- header: `x-apc-timestamp: <unix seconds>`
+- header: `x-apc-signature: sha256=<hex hmac>` where
+  - signature payload format is `<timestamp>.<raw json body>`
+  - hmac algorithm is SHA-256
+  - key is the platform webhook secret (for example `SAFECONNECT_WEBHOOK_SECRET`)
 - JSON body with optional fields:
 	- `eventType`
 	- `actor`
@@ -110,6 +114,12 @@ Example payload:
 ```
 
 Inbound webhook events are converted into APC audit activity and notifications so they appear in the master control center without custom per-page wiring.
+
+Compatibility mode (temporary migration only):
+
+- set `APC_ALLOW_LEGACY_WEBHOOK_SECRET_HEADER=1` to allow the older header auth
+- older header auth uses: `x-apc-webhook-secret: <platform webhook secret>`
+- disable this as soon as all apps are sending signed requests
 
 ## Backend Notes
 

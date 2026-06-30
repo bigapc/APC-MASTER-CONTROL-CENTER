@@ -92,6 +92,23 @@ export default async function SettingsPage() {
               Reachable endpoints: {runtime.platforms.filter((platform) => platform.publicReachable && platform.adminReachable).length}/{runtime.platformCount}
             </p>
           </div>
+
+          <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-5 md:col-span-2">
+            <p className="text-xs font-black uppercase tracking-wide text-zinc-500">Webhook Security</p>
+            <p className={`mt-2 text-lg font-black ${runtime.webhookLegacyHeaderEnabled ? "text-yellow-800" : "text-green-700"}`}>
+              {runtime.webhookLegacyHeaderEnabled ? "Compatibility mode" : "Strict signed mode"}
+            </p>
+            <p className="mt-2 text-sm font-bold text-zinc-700">
+              Send x-apc-timestamp and x-apc-signature where signature = HMAC-SHA256(secret, `${"{timestamp}"}.${"{rawBody}"}`).
+            </p>
+            {runtime.webhookLegacyHeaderEnabled ? (
+              <p className="mt-2 text-xs font-bold text-yellow-800">
+                Legacy fallback is enabled via APC_ALLOW_LEGACY_WEBHOOK_SECRET_HEADER=1. Disable it when all apps send signed webhooks.
+              </p>
+            ) : (
+              <p className="mt-2 text-xs font-bold text-green-700">Legacy x-apc-webhook-secret header is disabled.</p>
+            )}
+          </div>
         </div>
 
         <div className="mt-5 grid gap-4 lg:grid-cols-3">

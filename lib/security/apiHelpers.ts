@@ -40,7 +40,10 @@ export function withCors(response: NextResponse, requestOrigin?: string | null):
 
   response.headers.set("Access-Control-Allow-Origin", origin);
   response.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  response.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  response.headers.set(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization, X-APC-Timestamp, X-APC-Signature, X-APC-Webhook-Secret"
+  );
   response.headers.set("Vary", "Origin");
   return response;
 }

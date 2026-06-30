@@ -1,5 +1,6 @@
 import { APP_CONFIG } from "@/lib/appConfig";
 import { getDataMode, getRuntimeModeLabel, hasSupabaseConfig, isLiveMode } from "@/lib/dataMode";
+import { getWebhookSecurityMode } from "@/lib/integrations/webhooks";
 
 export type PlatformRuntimeStatus = {
   id: string;
@@ -139,6 +140,7 @@ export async function getRuntimeStatus() {
   });
 
   const shouldProbeConnectivity = isLiveMode();
+  const webhookSecurityMode = getWebhookSecurityMode();
 
   const [backendProbe, platforms] = await Promise.all([
     shouldProbeConnectivity ? probeSupabase(process.env.NEXT_PUBLIC_SUPABASE_URL) : Promise.resolve({
@@ -203,6 +205,8 @@ export async function getRuntimeStatus() {
     platformsConfigured: platforms.every((platform) => platform.ready),
     platformsReachable,
     platformCount: platforms.length,
+    webhookSecurityMode,
+    webhookLegacyHeaderEnabled: webhookSecurityMode === "compat-secret-header",
     liveReady: isLiveMode() && hasSupabaseConfig() && platforms.every((platform) => platform.ready) && backendProbe.reachable && platformsReachable,
   };
 }
