@@ -17,6 +17,22 @@ APC Master Control Center is the executive operations dashboard for Armstrong Pa
 3. Open `http://localhost:3000`.
 4. Sign in with the demo credentials shown on the login page.
 
+### Smoke Test
+
+Run a one-command pre-deploy smoke check (build + startup + critical routes/APIs):
+
+- `npm run smoke`
+
+The smoke run treats protected routes/APIs as healthy when they either:
+
+- return `200`, or
+- return `307` redirecting to `/login` (expected when auth enforcement is on)
+
+Optional environment overrides:
+
+- `SMOKE_PORT` (default `4010`)
+- `SMOKE_STARTUP_TIMEOUT_SECONDS` (default `90`)
+
 ## Live Platform Connection
 
 The app already supports live backend wiring. To connect all platforms, set these environment variables in `.env.local`:
