@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { SESSION_COOKIE, getUserFromSessionValue } from "@/lib/auth";
+import { isPreviewBypassEnabled } from "@/lib/security/previewMode";
 
 const PUBLIC_PATHS = ["/", "/login"];
 
@@ -21,6 +22,10 @@ function isPublicPath(pathname: string) {
 }
 
 export async function proxy(request: NextRequest) {
+  if (isPreviewBypassEnabled()) {
+    return NextResponse.next();
+  }
+
   const { pathname, search } = request.nextUrl;
   const sessionValue = request.cookies.get(SESSION_COOKIE)?.value;
   const user = await getUserFromSessionValue(sessionValue);

@@ -39,6 +39,7 @@ Optional but recommended:
 - `APC_OWNER_EMAIL` and `APC_OWNER_PASSWORD` for production local-fallback owner login
 - `APC_DISPATCHER_EMAIL` and `APC_DISPATCHER_PASSWORD` for production local-fallback dispatcher login
 - `APC_ENABLE_DEMO_CREDENTIALS=false` to explicitly disable demo credential fallback
+- `APC_PREVIEW_BYPASS_AUTH=true` to temporarily disable login and role checks for preview sessions
 
 Once those values are present, the backend status and control hubs pages will automatically switch from pending placeholders to configured platform links.
 
@@ -69,3 +70,5 @@ In production, demo credentials are disabled by default unless explicitly enable
 ## Notes
 
 This project is intentionally safe to run in demo mode. Live mode only becomes active when the required Supabase and platform URL environment variables are present.
+
+For temporary no-login preview, set `APC_PREVIEW_BYPASS_AUTH=true` (default is enabled in non-production). Set it to `false` to restore full auth enforcement.

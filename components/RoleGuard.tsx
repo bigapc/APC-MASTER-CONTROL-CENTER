@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { cookies } from "next/headers";
 import { SESSION_COOKIE, getUserFromSessionValue } from "@/lib/auth";
 import type { UserRole } from "@/lib/roles";
+import { isPreviewBypassEnabled } from "@/lib/security/previewMode";
 
 interface Props {
   allowedRoles: UserRole[];
@@ -12,6 +13,10 @@ export default async function RoleGuard({
   allowedRoles,
   children,
 }: Props) {
+  if (isPreviewBypassEnabled()) {
+    return <>{children}</>;
+  }
+
   const cookieStore = await cookies();
   const sessionValue = cookieStore.get(SESSION_COOKIE)?.value;
   const user = await getUserFromSessionValue(sessionValue);
