@@ -1,9 +1,10 @@
-"use client";
-
 import { Suspense } from "react";
+import { getDemoCredentials } from "@/lib/auth";
 import LoginForm from "./LoginForm";
 
 export default function LoginPage() {
+  const demoCredentials = getDemoCredentials();
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-black via-zinc-950 to-red-950 px-4 py-12 text-white">
       <div className="grid w-full max-w-5xl gap-8 overflow-hidden rounded-[2rem] border border-white/10 bg-white/5 shadow-2xl shadow-black/40 backdrop-blur md:grid-cols-[1.15fr_0.85fr]">
@@ -18,23 +19,25 @@ export default function LoginPage() {
             </h1>
 
             <p className="max-w-xl text-base leading-7 text-zinc-300 md:text-lg">
-              Use the APC demo credentials to enter the command center, monitor live systems, and move into the dashboard.
+              Sign in to enter the command center, monitor live systems, and move into the dashboard.
             </p>
           </div>
 
-          <div className="grid gap-3 rounded-3xl border border-white/10 bg-black/20 p-5 text-sm text-zinc-200 sm:grid-cols-2">
-            <div>
-              <div className="text-zinc-400">Demo admin</div>
-              <div className="mt-1 font-semibold">owner@apc.local</div>
-              <div className="text-zinc-400">apc_owner_2026</div>
+          {demoCredentials.length > 0 ? (
+            <div className="grid gap-3 rounded-3xl border border-white/10 bg-black/20 p-5 text-sm text-zinc-200 sm:grid-cols-2">
+              {demoCredentials.map((credential) => (
+                <div key={credential.email}>
+                  <div className="text-zinc-400">{credential.role}</div>
+                  <div className="mt-1 font-semibold">{credential.email}</div>
+                  <div className="text-zinc-400">{credential.password}</div>
+                </div>
+              ))}
             </div>
-
-            <div>
-              <div className="text-zinc-400">Dispatcher</div>
-              <div className="mt-1 font-semibold">dispatcher@apc.local</div>
-              <div className="text-zinc-400">dispatch_2026</div>
+          ) : (
+            <div className="rounded-3xl border border-white/10 bg-black/20 p-5 text-sm text-zinc-300">
+              Demo credentials are disabled for this environment.
             </div>
-          </div>
+          )}
         </div>
 
         <div className="border-t border-white/10 bg-black/30 p-8 md:border-l md:border-t-0 md:p-12">

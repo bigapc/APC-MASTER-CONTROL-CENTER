@@ -16,7 +16,7 @@ type AuthUser = CurrentUser & {
   password: string;
 };
 
-const AUTH_USERS: AuthUser[] = [
+const DEFAULT_AUTH_USERS: AuthUser[] = [
   {
     id: "apc-owner",
     name: "Darrell Armstrong",
@@ -33,6 +33,63 @@ const AUTH_USERS: AuthUser[] = [
   },
 ];
 
+function shouldEnableDemoUsers() {
+  const explicitEnable = process.env.APC_ENABLE_DEMO_CREDENTIALS?.trim().toLowerCase();
+  if (explicitEnable === "true") {
+    return true;
+  }
+
+  if (explicitEnable === "false") {
+    return false;
+  }
+
+  return process.env.NODE_ENV !== "production";
+}
+
+function getConfiguredUsers(): AuthUser[] {
+  const ownerEmail = process.env.APC_OWNER_EMAIL?.trim();
+  const ownerPassword = process.env.APC_OWNER_PASSWORD?.trim();
+  const ownerName = process.env.APC_OWNER_NAME?.trim() || "APC Owner";
+
+  const dispatcherEmail = process.env.APC_DISPATCHER_EMAIL?.trim();
+  const dispatcherPassword = process.env.APC_DISPATCHER_PASSWORD?.trim();
+  const dispatcherName = process.env.APC_DISPATCHER_NAME?.trim() || "APC Dispatcher";
+
+  const users: AuthUser[] = [];
+
+  if (ownerEmail && ownerPassword) {
+    users.push({
+      id: "apc-owner",
+      name: ownerName,
+      email: ownerEmail,
+      role: "super_admin",
+      password: ownerPassword,
+    });
+  }
+
+  if (dispatcherEmail && dispatcherPassword) {
+    users.push({
+      id: "apc-dispatch-1",
+      name: dispatcherName,
+      email: dispatcherEmail,
+      role: "dispatcher",
+      password: dispatcherPassword,
+    });
+  }
+
+  return users;
+}
+
+function getAuthUsers() {
+  const configured = getConfiguredUsers();
+
+  if (configured.length > 0) {
+    return configured;
+  }
+
+  return shouldEnableDemoUsers() ? DEFAULT_AUTH_USERS : [];
+}
+
 function toCurrentUser(user: AuthUser): CurrentUser {
   return {
     id: user.id,
@@ -42,7 +99,15 @@ function toCurrentUser(user: AuthUser): CurrentUser {
   };
 }
 
-export const currentUser: CurrentUser = toCurrentUser(AUTH_USERS[0]);
+export const currentUser: CurrentUser = toCurrentUser(
+  getAuthUsers()[0] ?? {
+    id: "apc-user",
+    name: "APC User",
+    email: "user@apc.local",
+    role: "dispatcher",
+    password: "",
+  }
+);
 
 function getSessionSecret() {
   const configuredSecret = process.env.APC_SESSION_SECRET?.trim();
@@ -99,8 +164,9 @@ async function verifySessionPayload(payload: string, signature: string) {
 }
 
 export function validateCredentials(email: string, password: string): CurrentUser | null {
+  const authUsers = getAuthUsers();
   const normalizedEmail = email.trim().toLowerCase();
-  const found = AUTH_USERS.find(
+  const found = authUsers.find(
     (user) => user.email.toLowerCase() === normalizedEmail && user.password === password
   );
 
@@ -110,6 +176,8 @@ export function validateCredentials(email: string, password: string): CurrentUse
 export async function getUserFromSessionValue(
   sessionValue?: string | null
 ): Promise<CurrentUser | null> {
+  const authUsers = getAuthUsers();
+
   if (!sessionValue) {
     return null;
   }
@@ -134,7 +202,7 @@ export async function getUserFromSessionValue(
       return null;
     }
 
-    const found = AUTH_USERS.find((user) => user.id === parsed.id);
+    const found = authUsers.find((user) => user.id === parsed.id);
     return found ? toCurrentUser(found) : null;
   } catch {
     return null;
@@ -156,7 +224,11 @@ export async function createSessionValue(user: CurrentUser): Promise<string> {
 }
 
 export function getDemoCredentials() {
-  return AUTH_USERS.map((user) => ({
+  if (!shouldEnableDemoUsers()) {
+    return [];
+  }
+
+  return getAuthUsers().map((user) => ({
     email: user.email,
     password: user.password,
     role: user.role,

@@ -36,6 +36,9 @@ Optional but recommended:
 
 - `GITHUB_TOKEN` for live GitHub status data
 - `APC_SESSION_SECRET` for production session signing
+- `APC_OWNER_EMAIL` and `APC_OWNER_PASSWORD` for production local-fallback owner login
+- `APC_DISPATCHER_EMAIL` and `APC_DISPATCHER_PASSWORD` for production local-fallback dispatcher login
+- `APC_ENABLE_DEMO_CREDENTIALS=false` to explicitly disable demo credential fallback
 
 Once those values are present, the backend status and control hubs pages will automatically switch from pending placeholders to configured platform links.
 
@@ -56,10 +59,12 @@ Once those values are present, the backend status and control hubs pages will au
 
 ## Demo Credentials
 
-The login screen exposes demo credentials for local use.
+The login screen can expose demo credentials in development.
 
 - `owner@apc.local` / `apc_owner_2026`
 - `dispatcher@apc.local` / `dispatch_2026`
+
+In production, demo credentials are disabled by default unless explicitly enabled with `APC_ENABLE_DEMO_CREDENTIALS=true`.
 
 ## Notes
 
