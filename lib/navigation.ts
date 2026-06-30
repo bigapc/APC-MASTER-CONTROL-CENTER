@@ -20,6 +20,10 @@ export const SIDEBAR_LINKS = [
     href: "/system-health",
   },
   {
+    label: "Launch Checklist",
+    href: "/checklist",
+  },
+  {
     label: "Organizations",
     href: "/organizations",
   },
