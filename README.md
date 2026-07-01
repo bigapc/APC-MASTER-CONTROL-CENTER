@@ -87,6 +87,22 @@ Optional but recommended:
 
 Once those values are present, the backend status, control hubs, settings, and launch-readiness surfaces will treat each app as fully integrated.
 
+### CSC-CorePlatform Same-Origin Local Mode
+
+If your current stack runs CommunitySafeConnect public app and the dispatcher control hub from one local origin, use this mapping in APC:
+
+- `NEXT_PUBLIC_COMMUNITYSAFECONNECT_PUBLIC_URL=http://localhost:4173`
+- `NEXT_PUBLIC_COMMUNITYSAFECONNECT_ADMIN_URL=http://localhost:4173`
+- `NEXT_PUBLIC_CSC_2_PUBLIC_URL=http://localhost:4173/hub/`
+- `NEXT_PUBLIC_CSC_2_ADMIN_URL=http://localhost:4173/hub/`
+
+CSC-CorePlatform run flow:
+
+- `npm run build:same-origin`
+- `npm run serve:same-origin` (or `npm run preview:same-origin`)
+- Public app URL: `http://localhost:4173/`
+- Control hub URL: `http://localhost:4173/hub/`
+
 For these three APC apps, the intended long-term onboarding model is:
 
 - create or deploy the app independently
