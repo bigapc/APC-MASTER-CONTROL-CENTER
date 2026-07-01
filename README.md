@@ -149,6 +149,14 @@ Compatibility mode (temporary migration only):
 - The app falls back to demo data when live keys are missing.
 - The login flow uses APC session cookies and redirects unauthenticated users to `/login`.
 
+## Stealth Operations Rule
+
+APC is an internal-only command layer and should remain non-visible from the public or standard admin UX of SafeConnect, CommunitySafeConnect, and CSC 2.0.
+
+- Do not render APC labels, links, or badges in downstream app UIs.
+- Keep APC integration server-to-server (webhooks, tokens, service connectors).
+- Treat APC as a silent monitoring and oversight plane (internal operators only).
+
 ## Useful Pages
 
 - `/` for the landing page

@@ -5,12 +5,22 @@ export const repositories = [
   },
 
   {
-    name: "SafeConnect-Dispatcher-Control-Center-MVP",
+    name: "safeconnect-core-system",
     owner: "bigapc",
   },
 
   {
-    name: "homework",
+    name: "safeconnect-dispatcher-platform",
+    owner: "bigapc",
+  },
+
+  {
+    name: "CommunitySafeConnect",
+    owner: "bigapc",
+  },
+
+  {
+    name: "CommunitySafeConnect-CSC-2.0",
     owner: "bigapc",
   },
 ];
