@@ -45,6 +45,7 @@ export const APP_CONFIG = {
       publicUrl: process.env.NEXT_PUBLIC_CSC_2_PUBLIC_URL || "#",
       adminUrl: process.env.NEXT_PUBLIC_CSC_2_ADMIN_URL || "#",
       accent: "Command Operations",
+      separationPolicyUrl: "/apps#app-separation-policy",
     },
     {
       id: "csc_nextgen",
@@ -57,6 +58,7 @@ export const APP_CONFIG = {
       publicUrl: process.env.NEXT_PUBLIC_CSC_NEXTGEN_PUBLIC_URL || "#",
       adminUrl: process.env.NEXT_PUBLIC_CSC_NEXTGEN_ADMIN_URL || "#",
       accent: "Independent Brand Experience",
+      separationPolicyUrl: "/apps#app-separation-policy",
     },
   ],
 };

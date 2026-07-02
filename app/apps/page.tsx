@@ -4,6 +4,7 @@ import { ExternalLink, ShieldCheck } from "lucide-react";
 
 export default async function AppsPage() {
   const runtime = await getRuntimeStatus();
+  const separatedPlatformIds = new Set(["csc_2_0", "csc_nextgen"]);
 
   return (
     <div className="space-y-8">
@@ -28,6 +29,15 @@ export default async function AppsPage() {
             <h2 className="mt-5 text-2xl font-black text-zinc-950">{app.name}</h2>
             <p className="mt-1 text-xs font-black uppercase tracking-wide text-[#c1121f]">{app.division}</p>
             <p className="mt-4 leading-7 text-zinc-600">{app.description}</p>
+
+            {separatedPlatformIds.has(app.id) ? (
+              <a
+                href={app.separationPolicyUrl || "/apps#app-separation-policy"}
+                className="mt-4 inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-black uppercase tracking-wide text-blue-800"
+              >
+                App Separation Policy
+              </a>
+            ) : null}
 
             <div className="mt-5 grid gap-3">
               <div className="rounded-2xl bg-zinc-50 p-4">
@@ -85,10 +95,13 @@ export default async function AppsPage() {
         })}
       </section>
 
-      <section className="apc-card p-6">
+      <section id="app-separation-policy" className="apc-card p-6">
         <h2 className="text-2xl font-black">Architecture Note</h2>
         <p className="mt-3 leading-7 text-zinc-600">
           Each app remains separate for public use and individual admin control. The APC Master Control Center monitors them through shared app IDs, role-based access, unified reports, analytics events, and audit logs.
+        </p>
+        <p className="mt-3 leading-7 text-zinc-600">
+          CommunitySafeConnect-CSC-2.0 and CSC NextGen are explicitly isolated from each other for business boundaries. Any cross-app data flow must be implemented as an approved, explicit integration.
         </p>
       </section>
     </div>

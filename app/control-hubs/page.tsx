@@ -5,6 +5,7 @@ import { ExternalLink, ShieldCheck } from "lucide-react";
 
 export default async function ControlHubsPage() {
   const runtime = await getRuntimeStatus();
+  const separatedPlatformIds = new Set(["csc_2_0", "csc_nextgen"]);
 
   return (
     <div className="space-y-8">
@@ -82,6 +83,16 @@ export default async function ControlHubsPage() {
             <h2 className="mt-5 text-2xl font-black text-zinc-950">{app.name}</h2>
             <p className="mt-1 text-xs font-black uppercase tracking-wide text-[#c1121f]">{app.division}</p>
             <p className="mt-4 leading-7 text-zinc-600">{app.description}</p>
+
+            {separatedPlatformIds.has(app.id) ? (
+              <Link
+                href={app.separationPolicyUrl || "/apps#app-separation-policy"}
+                className="mt-4 inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-black uppercase tracking-wide text-blue-800"
+              >
+                App Separation Policy
+              </Link>
+            ) : null}
+
             <div className="mt-5 rounded-2xl bg-zinc-50 p-4">
               <p className="text-xs font-black uppercase text-zinc-500">App ID</p>
               <p className="mt-1 font-mono text-sm font-bold">{app.id}</p>
