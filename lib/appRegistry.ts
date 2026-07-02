@@ -19,4 +19,11 @@ export const APP_REGISTRY = [
     status: "monitoring",
     color: "#c1121f",
   },
+
+  {
+    id: "csc_nextgen",
+    name: "CommunitySafeConnect CSC NextGen",
+    status: "monitoring",
+    color: "#0f4c81",
+  },
 ];

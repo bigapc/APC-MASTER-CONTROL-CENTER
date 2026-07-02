@@ -46,6 +46,18 @@ export const APP_CONFIG = {
       adminUrl: process.env.NEXT_PUBLIC_CSC_2_ADMIN_URL || "#",
       accent: "Command Operations",
     },
+    {
+      id: "csc_nextgen",
+      name: "CommunitySafeConnect-CSC-NextGen",
+      division: "Standalone NextGen Experience",
+      description:
+        "Independent CSC NextGen app with separate runtime and access boundaries for business separation.",
+      status: "active",
+      health: "monitoring",
+      publicUrl: process.env.NEXT_PUBLIC_CSC_NEXTGEN_PUBLIC_URL || "#",
+      adminUrl: process.env.NEXT_PUBLIC_CSC_NEXTGEN_ADMIN_URL || "#",
+      accent: "Independent Brand Experience",
+    },
   ],
 };
 
@@ -80,7 +92,7 @@ export const DAILY_OPERATION_CHECKLIST = [
   "Confirm courier availability and pending assignments",
   "Review alerts, notifications, and failed system checks",
   "Review staff activity and audit log changes",
-  "Confirm all three application health cards show stable status",
+  "Confirm all four application health cards show stable status",
 ];
 
 export const DEMO_ALERTS = [

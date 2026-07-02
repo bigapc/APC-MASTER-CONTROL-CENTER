@@ -14,4 +14,9 @@ export const APC_PLATFORMS = [
     name: "CommunitySafeConnect CSC 2.0",
     status: "warning",
   },
+  {
+    id: "csc_nextgen",
+    name: "CommunitySafeConnect CSC NextGen",
+    status: "warning",
+  },
 ];

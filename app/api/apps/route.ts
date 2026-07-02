@@ -20,6 +20,10 @@ export async function GET(request: Request) {
         id: "csc_2_0",
         name: "CSC 2.0",
       },
+      {
+        id: "csc_nextgen",
+        name: "CSC NextGen",
+      },
     ],
   }), request.headers.get("origin"));
 }

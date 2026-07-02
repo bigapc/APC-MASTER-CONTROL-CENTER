@@ -5,6 +5,7 @@ import { isPreviewBypassEnabled } from "@/lib/security/previewMode";
 
 export default function HomePage() {
   const previewBypass = isPreviewBypassEnabled();
+  const currentYear = new Date().getFullYear();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-zinc-950 to-red-950 px-4 py-8 text-white md:px-8 md:py-12">
@@ -20,7 +21,7 @@ export default function HomePage() {
 
           <p className="mt-5 max-w-2xl text-lg leading-8 text-zinc-300 md:text-xl">
             A private executive command environment built to monitor SafeConnect,
-            CommunitySafeConnect, and CommunitySafeConnect-CSC-2.0 from one secure place.
+            CommunitySafeConnect, CommunitySafeConnect-CSC-2.0, and CSC NextGen from one secure place.
           </p>
 
           <div className="mt-8 grid gap-4 sm:grid-cols-3">
@@ -56,6 +57,15 @@ export default function HomePage() {
               <ShieldCheck size={18} className="text-red-300" />
               Approved for executive oversight
             </div>
+          </div>
+
+          <div className="mt-8 rounded-3xl border border-white/10 bg-black/25 p-6 text-sm leading-7 text-zinc-300">
+            <p className="font-semibold uppercase tracking-[0.2em] text-red-200">
+              Powered by Armstrong Pack Company
+            </p>
+            <p className="mt-3">
+              Copyright {currentYear} Armstrong Pack Company. All rights reserved.
+            </p>
           </div>
         </section>
 

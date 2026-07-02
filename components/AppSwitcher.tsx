@@ -2,6 +2,7 @@ const apps = [
   "SafeConnect",
   "CommunitySafeConnect",
   "CSC 2.0",
+  "CSC NextGen",
 ];
 
 export default function AppSwitcher() {

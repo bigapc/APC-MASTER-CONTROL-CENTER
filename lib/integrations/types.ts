@@ -1,7 +1,8 @@
 export type PlatformId =
   | "safeconnect"
   | "communitysafeconnect"
-  | "csc_2_0";
+  | "csc_2_0"
+  | "csc_nextgen";
 
 export interface PlatformReport {
   id: string;

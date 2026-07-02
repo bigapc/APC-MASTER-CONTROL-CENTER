@@ -13,6 +13,10 @@ export const appRegistryService = {
       id: "csc_2_0",
       name: "CommunitySafeConnect CSC 2.0",
     },
+    {
+      id: "csc_nextgen",
+      name: "CommunitySafeConnect CSC NextGen",
+    },
   ],
 
   getAll() {
