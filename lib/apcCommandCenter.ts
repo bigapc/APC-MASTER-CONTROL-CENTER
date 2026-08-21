@@ -1,8 +1,7 @@
 export const APC_COMMAND = {
   companyName: "Armstrong Pack Company",
 
-  mission:
-    "Saving Lives and Building Stronger Communities through Safety and Connections.",
+  mission: "Saving Lives And Building Stronger Communities.",
 
   applications: [
     "SafeConnect",
