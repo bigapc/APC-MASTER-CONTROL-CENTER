@@ -1,4 +1,5 @@
 import CommandSidebar from "@/components/CommandSidebar";
+import CommandFooter from "@/components/CommandFooter";
 
 export default function ExecutiveLayout({
   children,
@@ -12,6 +13,8 @@ export default function ExecutiveLayout({
       <main className="flex-1 px-4 py-6 md:px-8 md:py-8 lg:px-10">
         {children}
       </main>
+
+      <CommandFooter />
     </div>
   );
 }

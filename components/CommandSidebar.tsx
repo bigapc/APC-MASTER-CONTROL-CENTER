@@ -5,6 +5,7 @@ import Link from "next/link";
 const links = [
   "/dashboard",
   "/executive-command",
+  "/apc-ai",
   "/admin-roles",
   "/apps",
   "/dispatch",
@@ -31,7 +32,11 @@ export default function CommandSidebar() {
             href={link}
             className="block rounded-xl p-3 hover:bg-zinc-900"
           >
-            {link === "/executive-command" ? "Executive Command" : link}
+            {link === "/executive-command"
+              ? "Executive Command"
+              : link === "/apc-ai"
+                ? "APC AI"
+                : link}
           </Link>
         ))}
       </nav>

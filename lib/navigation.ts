@@ -4,6 +4,14 @@ export const SIDEBAR_LINKS = [
     href: "/dashboard",
   },
   {
+    label: "Executive Command",
+    href: "/executive-command",
+  },
+  {
+    label: "APC AI",
+    href: "/apc-ai",
+  },
+  {
     label: "Applications",
     href: "/apps",
   },

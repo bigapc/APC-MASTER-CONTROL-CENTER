@@ -1,6 +1,9 @@
 import { Crown, Landmark, BriefcaseBusiness, Megaphone, Cpu, ShieldCheck, Activity, Database } from "lucide-react";
 import Link from "next/link";
 import DataSourceBadge from "@/components/DataSourceBadge";
+import AuthGuard from "@/components/AuthGuard";
+import RoleGuard from "@/components/RoleGuard";
+import ExecutiveLayout from "@/components/layouts/ExecutiveLayout";
 
 const executives = [
   {
@@ -42,7 +45,10 @@ const executives = [
 
 export default function ExecutiveCommandPage() {
   return (
-    <div className="space-y-8">
+    <AuthGuard>
+      <RoleGuard allowedRoles={["super_admin"]}>
+        <ExecutiveLayout>
+          <div className="space-y-8">
       <section className="apc-card-dark p-8">
         <div className="flex flex-col justify-between gap-6 md:flex-row md:items-start">
           <div>
@@ -110,6 +116,9 @@ export default function ExecutiveCommandPage() {
           </Link>
         </div>
       </section>
-    </div>
+          </div>
+        </ExecutiveLayout>
+      </RoleGuard>
+    </AuthGuard>
   );
 }
