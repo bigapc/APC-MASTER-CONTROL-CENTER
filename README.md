@@ -1,112 +1,182 @@
 # APC Master Control Center
 
-Central private control center for monitoring and managing:
+APC Master Control Center is the executive operations dashboard for Armstrong Pack Company. It provides a single control surface for SafeConnect, CommunitySafeConnect, and CommunitySafeConnect-CSC-2.0 with demo/live runtime switching, signed session auth, and platform readiness tracking.
 
-- SafeConnect (`safeconnect`)
-- CommunitySafeConnect (`communitysafeconnect`)
-- CSC 2.0 (`csc_2_0`)
+## What It Includes
 
-Each child app remains independent (repo, deployment, public/admin UX), while all apps send operational data into one shared APC backend.
+- Signed login session flow with protected routes
+- APC landing page, login page, and executive dashboard
+- Backend status and control hub pages for platform connection tracking
+- Demo data mode and live Supabase mode
+- Platform readiness indicators for SafeConnect, CommunitySafeConnect, and CSC 2.0
 
-## Architecture
+## Master Platform Scope
 
-- **One central Supabase project** for all backend data.
-- **App data partitioning by `app_id`** in core operational tables.
-- **One private control-center app** for APC staff and approved partners.
-- **Role + app-scoped access control** with Supabase RLS.
+The APC master platform is being tightened around these core capability domains:
 
-## Required environment variables (per child app)
+- Live command maps
+- GPS tracking
+- Alerts and escalation command
+- Historical school data access
+- Financial data and analytics
 
-Use the same Supabase project for all child apps:
+These capabilities are tracked in the shared registry used by frontend and backend at `lib/config/masterPlatformCapabilities.ts` and exposed via `GET /api/platform-capabilities`.
 
-```bash
-NEXT_PUBLIC_SUPABASE_URL=<apc-central-supabase-url>
-NEXT_PUBLIC_SUPABASE_ANON_KEY=<apc-central-supabase-anon-key>
-```
+## Local Development
 
-Set a unique app identifier per app deployment:
+1. Install dependencies.
+2. Run the dev server with `npm run dev`.
+3. Open `http://localhost:3000`.
+4. Sign in with the demo credentials shown on the login page.
 
-```bash
-# SafeConnect
-NEXT_PUBLIC_APP_ID=safeconnect
+### Smoke Test
 
-# CommunitySafeConnect
-NEXT_PUBLIC_APP_ID=communitysafeconnect
+Run a one-command pre-deploy smoke check (build + startup + critical routes/APIs):
 
-# CommunitySafeConnect-CSC-2.0
-NEXT_PUBLIC_APP_ID=csc_2_0
-```
+- `npm run smoke`
 
-## Database setup
+The smoke run treats protected routes/APIs as healthy when they either:
 
-Apply this migration in your Supabase project:
+- return `200`, or
+- return `307` redirecting to `/login` (expected when auth enforcement is on)
 
-- `supabase/migrations/0001_apc_master_control_center.sql`
+Optional environment overrides:
 
-What it creates:
+- `SMOKE_PORT` (default `4010`)
+- `SMOKE_STARTUP_TIMEOUT_SECONDS` (default `90`)
 
-- `apps`
-- `organizations`
-- `apc_admins`
-- `unified_reports`
-- `audit_logs`
-- `analytics_events`
+## Live Platform Connection
 
-It also enables RLS and provides baseline policies that:
+The app already supports live backend wiring. To connect all platforms, set these environment variables in `.env.local`:
 
-- allow `super_admin` full visibility
-- restrict scoped admins to rows where `app_id` is in their `app_access`
+- `NEXT_PUBLIC_DATA_MODE=live`
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `NEXT_PUBLIC_SAFECONNECT_PUBLIC_URL`
+- `NEXT_PUBLIC_SAFECONNECT_ADMIN_URL`
+- `SAFECONNECT_WEBHOOK_SECRET`
+- `SAFECONNECT_SERVICE_TOKEN`
+- `NEXT_PUBLIC_COMMUNITYSAFECONNECT_PUBLIC_URL`
+- `NEXT_PUBLIC_COMMUNITYSAFECONNECT_ADMIN_URL`
+- `COMMUNITYSAFECONNECT_WEBHOOK_SECRET`
+- `COMMUNITYSAFECONNECT_SERVICE_TOKEN`
+- `NEXT_PUBLIC_CSC_2_PUBLIC_URL`
+- `NEXT_PUBLIC_CSC_2_ADMIN_URL`
+- `CSC_2_WEBHOOK_SECRET`
+- `CSC_2_SERVICE_TOKEN`
 
-## Recommended control center routes
+Capability readiness connector variables:
 
-Start with:
+- `APC_MAP_PROVIDER_URL`
+- `APC_GPS_STREAM_URL`
+- `APC_GPS_STREAM_TOKEN`
+- `APC_SCHOOL_DATA_SOURCE_URL`
+- `APC_SCHOOL_DATA_ACCESS_TOKEN`
+- `APC_FINANCE_DATA_SOURCE_URL`
+- `APC_FINANCE_DATA_ACCESS_TOKEN`
 
-- `/dashboard`
-- `/reports`
-- `/users`
-- `/apps`
-- `/audit-logs`
-- `/settings`
+Optional but recommended:
 
-Then expand with:
+- `GITHUB_TOKEN` for live GitHub status data
+- `APC_SESSION_SECRET` for production session signing
+- `APC_OWNER_EMAIL` and `APC_OWNER_PASSWORD` for production local-fallback owner login
+- `APC_DISPATCHER_EMAIL` and `APC_DISPATCHER_PASSWORD` for production local-fallback dispatcher login
+- `APC_ENABLE_DEMO_CREDENTIALS=false` to explicitly disable demo credential fallback
+- `APC_PREVIEW_BYPASS_AUTH=true` to temporarily disable login and role checks for preview sessions
 
-- `/dispatch`
-- `/couriers`
-- `/organizations`
-- `/analytics`
-- `/billing`
-- `/system-health`
+Once those values are present, the backend status, control hubs, settings, and launch-readiness surfaces will treat each app as fully integrated.
 
-## App-level runtime config example
+### CSC-CorePlatform Same-Origin Local Mode
 
-Use a shared app config pattern in each child app:
+If your current stack runs CommunitySafeConnect public app and the dispatcher control hub from one local origin, use this mapping in APC:
 
-```ts
-export const APP_CONFIG = {
-  appId: process.env.NEXT_PUBLIC_APP_ID || '__unset__',
-  appName: process.env.NEXT_PUBLIC_APP_NAME || 'SafeConnect',
-};
+- `NEXT_PUBLIC_COMMUNITYSAFECONNECT_PUBLIC_URL=http://localhost:4173`
+- `NEXT_PUBLIC_COMMUNITYSAFECONNECT_ADMIN_URL=http://localhost:4173`
+- `NEXT_PUBLIC_CSC_2_PUBLIC_URL=http://localhost:4173/hub/`
+- `NEXT_PUBLIC_CSC_2_ADMIN_URL=http://localhost:4173/hub/`
 
-if (APP_CONFIG.appId === '__unset__') {
-  throw new Error('NEXT_PUBLIC_APP_ID is required');
-}
-```
+CSC-CorePlatform run flow:
 
-And ensure writes include `app_id`:
+- `npm run build:same-origin`
+- `npm run serve:same-origin` (or `npm run preview:same-origin`)
+- Public app URL: `http://localhost:4173/`
+- Control hub URL: `http://localhost:4173/hub/`
 
-```ts
-await supabase.from('unified_reports').insert({
-  app_id: APP_CONFIG.appId,
-  report_type: 'safety_request',
-  title: 'New safety request',
-  description: 'User submitted a request',
-  priority: 'normal',
-  status: 'open',
-});
-```
+For these three APC apps, the intended long-term onboarding model is:
+
+- create or deploy the app independently
+- set its public/admin URLs in APC
+- add its webhook secret and service token to APC
+- let APC consume events, status checks, and oversight data from one master control center
+
+That means you should not need a separate master-center rewrite for each app once SafeConnect, CommunitySafeConnect, and CSC 2.0 are fully built. You will mainly be supplying credentials and endpoint configuration.
+
+## Inbound Webhooks
+
+APC now exposes per-platform webhook intake endpoints so each app can push activity into the master control center:
+
+- `/api/webhooks/safeconnect`
+- `/api/webhooks/communitysafeconnect`
+- `/api/webhooks/csc_2_0`
+
+Each request should include:
+
+- header: `x-apc-timestamp: <unix seconds>`
+- header: `x-apc-signature: sha256=<hex hmac>` where
+  - signature payload format is `<timestamp>.<raw json body>`
+  - hmac algorithm is SHA-256
+  - key is the platform webhook secret (for example `SAFECONNECT_WEBHOOK_SECRET`)
+- JSON body with optional fields:
+  - `eventType`
+  - `actor`
+  - `title`
+  - `message`
+  - `level` (`info`, `warning`, `critical`)
+  - `payload`
+
+Inbound webhook events are converted into APC audit activity and notifications so they appear in the master control center without custom per-page wiring.
+
+Compatibility mode (temporary migration only):
+
+- set `APC_ALLOW_LEGACY_WEBHOOK_SECRET_HEADER=1` to allow the older header auth
+- older header auth uses: `x-apc-webhook-secret: <platform webhook secret>`
+- disable this as soon as all apps are sending signed requests
+
+## Backend Notes
+
+- Supabase reads are handled through the shared helpers in `lib/supabase/*`.
+- The app falls back to demo data when live keys are missing.
+- The login flow uses APC session cookies and redirects unauthenticated users to `/login`.
+
+## Stealth Operations Rule
+
+APC is an internal-only command layer and should remain non-visible from the public or standard admin UX of SafeConnect, CommunitySafeConnect, and CSC 2.0.
+
+- Do not render APC labels, links, or badges in downstream app UIs.
+- Keep APC integration server-to-server (webhooks, tokens, service connectors).
+- Treat APC as a silent monitoring and oversight plane (internal operators only).
+
+## Useful Pages
+
+- `/` for the landing page
+- `/login` for authentication
+- `/dashboard` for the command center
+- `/backend-status` for live backend readiness
+- `/control-hubs` for platform connection links
+- `/apps` for the connected platform registry
+
+## Demo Credentials
+
+The login screen can expose demo credentials in development.
+
+- `owner@apc.local` / `apc_owner_2026`
+- `dispatcher@apc.local` / `dispatch_2026`
+
+In production, demo credentials are disabled by default unless explicitly enabled with `APC_ENABLE_DEMO_CREDENTIALS=true`.
 
 ## Notes
 
-- Keep the three products separate: each app should retain its own repository, deployment pipeline, and public/admin UX.
-- Do not merge them into one monolith; only share the central backend operational data layer.
-- Use this repository as the central APC control-center foundation.
+This project is intentionally safe to run in demo mode. Live mode only becomes active when the required Supabase and platform URL environment variables are present.
+
+For temporary no-login preview, set `APC_PREVIEW_BYPASS_AUTH=true` (default is enabled in non-production). Set it to `false` to restore full auth enforcement.
