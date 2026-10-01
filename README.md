@@ -196,3 +196,7 @@ In production, demo credentials are disabled by default unless explicitly enable
 This project is intentionally safe to run in demo mode. Live mode only becomes active when the required Supabase and platform URL environment variables are present.
 
 For temporary no-login preview, set `APC_PREVIEW_BYPASS_AUTH=true` (default is enabled in non-production). Set it to `false` to restore full auth enforcement.
+
+## Brand Identity and Emergency Backup Standard
+
+The official APC logo and the separate APPC LLC logo concept are governed by [`docs/APC-BRAND-IDENTITY-AND-LOGO-REGISTER.md`](docs/APC-BRAND-IDENTITY-AND-LOGO-REGISTER.md). The document defines the unchanged APC master mark, APC Daily Pay Card naming and card colorways, the separate APPC LLC concept, and the plan for a dedicated emergency backup repository. The dedicated backup repository is planned separately and is not this application repository.
