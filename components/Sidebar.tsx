@@ -14,6 +14,14 @@ import {
   Server,
   Settings,
   Users,
+  BrainCircuit,
+  Boxes,
+  Cable,
+  MessagesSquare,
+  GraduationCap,
+  ShieldAlert,
+  FileKey2,
+  Scale,
 } from "lucide-react";
 import { APP_CONFIG } from "@/lib/appConfig";
 import { SIDEBAR_LINKS } from "@/lib/navigation";
@@ -33,6 +41,20 @@ const iconByLabel = {
   "Franchise Network": Network,
   Settings: Settings,
   Users: Users,
+  "APC AI": BrainCircuit,
+  "APC Units": Boxes,
+  Integrations: Cable,
+  Operations: Radio,
+  Communications: MessagesSquare,
+  "APC Academy": GraduationCap,
+  "Work Management": ClipboardCheck,
+  "Incident Command": ShieldAlert,
+  "Integration Gateway": Cable,
+  Organization: Building2,
+  Personnel: Users,
+  "Access Management": KeyRound,
+  "Access Audit": FileKey2,
+  Governance: Scale,
 } as const;
 
 export default function Sidebar() {

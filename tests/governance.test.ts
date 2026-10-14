@@ -6,7 +6,7 @@ import { unavailableGovernanceAdapter } from "../lib/governance/adapter.ts";
 import { createLocalGovernanceAdapter } from "../lib/governance/local-adapter.ts";
 import { activatePolicyRecord, approvePolicyRecord, createAcknowledgment, createApproval, createPolicy, createPolicyVersion, createProcedure, getGovernance, getPolicy, transitionPolicy, updatePolicy } from "../lib/governance/service.ts";
 import { canTransitionPolicyStatus } from "../lib/governance/types.ts";
-import { isCreateAcknowledgmentInput, isCreatePolicyInput, isCreatePolicyVersionInput, isCreateProcedureInput } from "../lib/governance/validation.ts";
+import { isCreateAcknowledgmentInput, isCreateApprovalInput, isCreatePolicyInput, isCreatePolicyVersionInput, isCreateProcedureInput } from "../lib/governance/validation.ts";
 
 const user = (role: "super_admin" | "dispatcher") => ({ id: role, name: role, email: `${role}@example.test`, role });
 
@@ -56,10 +56,15 @@ test("governance input validators accept valid payloads and reject missing or ma
   assert.equal(isCreatePolicyInput({ title: " ", category: "OPERATIONS", status: "DRAFT" }), false);
   assert.equal(isCreatePolicyInput({ title: "Policy", category: "UNKNOWN", status: "DRAFT" }), false);
   assert.equal(isCreatePolicyInput({ title: "Policy", category: "OTHER", status: "DRAFT", unitId: "unknown-unit" }), false);
+  assert.equal(isCreatePolicyInput({ title: "Policy", category: "OTHER", status: "DRAFT", role: "super_admin" }), false);
   assert.equal(isCreateProcedureInput({ title: "Procedure", operationalSteps: ["Step"] }), true);
   assert.equal(isCreateProcedureInput({ title: "Procedure", operationalSteps: "not-an-array" }), false);
+  assert.equal(isCreateProcedureInput({ title: "Procedure", status: "DRAFT", approvalStatus: "APPROVED" }), false);
   assert.equal(isCreatePolicyVersionInput({ policyId: "policy", version: "1.0", status: "DRAFT", contentReference: "local" }), true);
   assert.equal(isCreatePolicyVersionInput({ policyId: "policy", version: "", status: "DRAFT", contentReference: "local" }), false);
+  assert.equal(isCreatePolicyVersionInput({ policyId: "policy", version: "1.0", status: "DRAFT", contentReference: "local", role: "super_admin" }), false);
+  assert.equal(isCreateApprovalInput({ policyId: "policy", policyVersionId: "version", reviewerReference: "reviewer", decision: "APPROVED", comments: null, state: "APPROVAL" }), true);
+  assert.equal(isCreateApprovalInput({ policyId: "policy", policyVersionId: "version", reviewerReference: "reviewer", decision: "APPROVED", comments: null, state: "APPROVAL", status: "ACTIVE" }), false);
   assert.equal(isCreateAcknowledgmentInput({ policyId: "policy", policyVersionId: "version", userReference: "user" }), true);
   assert.equal(isCreateAcknowledgmentInput({ policyId: "policy", policyVersionId: "version" }), false);
   assert.equal(isCreateAcknowledgmentInput({ policyId: "policy", policyVersionId: "version", userReference: "user", status: "PENDING" }), false);

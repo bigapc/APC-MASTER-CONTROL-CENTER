@@ -1,5 +1,9 @@
 import type { NextConfig } from "next";
 
+const SCRIPT_POLICY = process.env.NODE_ENV === "development"
+  ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
+  : "script-src 'self'";
+
 const SECURITY_HEADERS = [
   // Prevent browsers from sniffing MIME types
   { key: "X-Content-Type-Options", value: "nosniff" },
@@ -23,7 +27,7 @@ const SECURITY_HEADERS = [
     key: "Content-Security-Policy",
     value: [
       "default-src 'self'",
-      "script-src 'self'",
+      SCRIPT_POLICY,
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: https:",
       "font-src 'self'",

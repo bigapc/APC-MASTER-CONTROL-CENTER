@@ -26,6 +26,10 @@ export function isNonEmptyString(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
 }
 
+function hasOnlyKeys(value: Record<string, unknown>, keys: readonly string[]): boolean {
+  return Object.keys(value).every((key) => keys.includes(key));
+}
+
 function optionalString(value: Record<string, unknown>, key: string, nullable = false): boolean {
   return !(key in value) || isNonEmptyString(value[key]) || (nullable && value[key] === null);
 }
@@ -44,7 +48,8 @@ export function isStringRecord(value: unknown): value is Readonly<Record<string,
 
 export function isCreatePolicyInput(value: unknown): value is CreatePolicyInput {
   if (!isRecord(value)) return false;
-  return isNonEmptyString(value.title)
+  return hasOnlyKeys(value, ["policyId", "title", "category", "description", "ownerReference", "apcUnitReference", "status", "version", "unitId", "currentVersionId", "effectiveDate", "reviewDate", "approvalStatus", "createdAt", "updatedAt", "supersededPolicyReference"])
+    && isNonEmptyString(value.title)
     && POLICY_CATEGORIES.includes(value.category as PolicyCategory)
     && POLICY_STATUSES.includes(value.status as PolicyStatus)
     && optionalString(value, "policyId")
@@ -64,7 +69,8 @@ export function isCreatePolicyInput(value: unknown): value is CreatePolicyInput 
 
 export function isCreateProcedureInput(value: unknown): value is CreateProcedureInput {
   if (!isRecord(value)) return false;
-  return isNonEmptyString(value.title)
+  return hasOnlyKeys(value, ["procedureId", "title", "policyId", "apcUnitReference", "unitId", "department", "operationalSteps", "ownerReference", "status", "version", "currentVersionId", "reviewDate"])
+    && isNonEmptyString(value.title)
     && optionalString(value, "procedureId")
     && optionalString(value, "policyId", true)
     && optionalUnitReference(value, "apcUnitReference")
@@ -80,7 +86,8 @@ export function isCreateProcedureInput(value: unknown): value is CreateProcedure
 
 export function isCreatePolicyVersionInput(value: unknown): value is CreatePolicyVersionInput {
   if (!isRecord(value)) return false;
-  return isNonEmptyString(value.policyId)
+  return hasOnlyKeys(value, ["versionId", "policyId", "version", "status", "contentReference", "createdAt"])
+    && isNonEmptyString(value.policyId)
     && isNonEmptyString(value.version)
     && POLICY_STATUSES.includes(value.status as PolicyStatus)
     && isNonEmptyString(value.contentReference)
@@ -90,7 +97,8 @@ export function isCreatePolicyVersionInput(value: unknown): value is CreatePolic
 
 export function isCreateApprovalInput(value: unknown): value is CreateApprovalInput {
   if (!isRecord(value)) return false;
-  return isNonEmptyString(value.policyId)
+  return hasOnlyKeys(value, ["approvalId", "policyId", "policyVersionId", "reviewerReference", "decision", "comments", "createdAt", "state"])
+    && isNonEmptyString(value.policyId)
     && isNonEmptyString(value.policyVersionId)
     && isNonEmptyString(value.reviewerReference)
     && APPROVAL_DECISIONS.includes(value.decision as ApprovalDecision)

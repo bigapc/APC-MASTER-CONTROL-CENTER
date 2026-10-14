@@ -11,6 +11,7 @@ import OperationsTimelinePanel from "@/components/OperationsTimelinePanel";
 import ExecutiveLayout from "@/components/layouts/ExecutiveLayout";
 import CommandHeader from "@/components/CommandHeader";
 import MasterPlatformScope from "@/components/MasterPlatformScope";
+import APCUnitStatusBoard from "@/components/APCUnitStatusBoard";
 
 export default function DashboardPage() {
   return (
@@ -21,6 +22,8 @@ export default function DashboardPage() {
         <CommandCenterHero />
 
         <MasterPlatformScope />
+
+        <APCUnitStatusBoard compact />
 
         <ExecutiveMetrics />
 

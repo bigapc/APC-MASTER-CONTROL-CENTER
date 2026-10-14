@@ -8,6 +8,8 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { APC_COMMAND } from "@/lib/apcCommandCenter";
+import AuthGuard from "@/components/AuthGuard";
+import ExecutiveLayout from "@/components/layouts/ExecutiveLayout";
 import DataSourceBadge from "@/components/DataSourceBadge";
 import DatasetSourceList from "@/components/DatasetSourceList";
 import {
@@ -67,7 +69,9 @@ export default async function AnalyticsPage() {
   ];
 
   return (
-    <div className="space-y-8">
+    <AuthGuard>
+      <ExecutiveLayout>
+        <div className="space-y-8">
       <section className="apc-card-dark p-8">
         <div className="apc-badge">Executive Analytics Center</div>
         <div className="mt-4">
@@ -138,6 +142,19 @@ export default async function AnalyticsPage() {
         </div>
       </section>
 
+      <section className="apc-card p-6">
+        <h2 className="text-2xl font-black">Future Analytics Architecture</h2>
+        <p className="mt-3 text-sm text-zinc-600">Future adapters can provide authorized data without changing this interface.</p>
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {["Unit Performance", "Operational Activity", "Development Progress", "Integration Readiness", "Department Analytics", "Staff Analytics", "Service Performance"].map((category) => (
+            <div key={category} className="rounded-xl border border-zinc-200 bg-zinc-50 p-4">
+              <p className="font-bold">{category}</p>
+              <p className="mt-1 text-sm text-zinc-500">Analytics integration pending</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       <section className="grid gap-6 lg:grid-cols-2">
         <div className="apc-card p-6">
           <div className="flex items-center gap-3">
@@ -147,7 +164,7 @@ export default async function AnalyticsPage() {
 
           <div className="mt-5 space-y-4">
             <div className="rounded-xl bg-zinc-50 p-4">
-              Average Response Time: 4.2 min
+              Average Response Time: Analytics Connection Pending
             </div>
 
             <div className="rounded-xl bg-zinc-50 p-4">
@@ -159,7 +176,7 @@ export default async function AnalyticsPage() {
             </div>
 
             <div className="rounded-xl bg-zinc-50 p-4">
-              Resolved Today: {dashboardMetrics.resolvedCases - 88}
+              Resolved Today: No Live Data Available
             </div>
           </div>
         </div>
@@ -172,14 +189,16 @@ export default async function AnalyticsPage() {
               Partner Organizations: {dashboardMetrics.organizations}
             </div>
 
-            <div className="rounded-xl bg-zinc-50 p-4">Agency Accounts: 3</div>
+            <div className="rounded-xl bg-zinc-50 p-4">Agency Accounts: Analytics Connection Pending</div>
 
-            <div className="rounded-xl bg-zinc-50 p-4">Franchise Locations: 0</div>
+            <div className="rounded-xl bg-zinc-50 p-4">Franchise Locations: Analytics Connection Pending</div>
 
-            <div className="rounded-xl bg-zinc-50 p-4">Expansion Regions: 4</div>
+            <div className="rounded-xl bg-zinc-50 p-4">Expansion Regions: Analytics Connection Pending</div>
           </div>
         </div>
       </section>
-    </div>
+        </div>
+      </ExecutiveLayout>
+    </AuthGuard>
   );
 }
