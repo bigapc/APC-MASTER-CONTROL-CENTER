@@ -17,25 +17,14 @@ const SECURITY_HEADERS = [
     key: "Strict-Transport-Security",
     value: "max-age=63072000; includeSubDomains; preload",
   },
-  // Content Security Policy
-  // 'unsafe-inline' only for styles (Tailwind CSS runtime requirement)
-  {
-    key: "Content-Security-Policy",
-    value: [
-      "default-src 'self'",
-      "script-src 'self'",
-      "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: https:",
-      "font-src 'self'",
-      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.github.com",
-      "frame-ancestors 'none'",
-      "base-uri 'self'",
-      "form-action 'self'",
-    ].join("; "),
-  },
 ];
 
 const nextConfig: NextConfig = {
+  // Keep Turbopack scoped to this app even when parent directories have lockfiles.
+  turbopack: {
+    root: process.cwd(),
+  },
+
   // Apply security headers to every route
   async headers() {
     return [

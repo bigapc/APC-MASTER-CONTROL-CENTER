@@ -1,7 +1,7 @@
 export type DataMode = "demo" | "live";
 
 export function getDataMode(): DataMode {
-  const mode = process.env.NEXT_PUBLIC_DATA_MODE?.toLowerCase();
+  const mode = process.env.NEXT_PUBLIC_DATA_MODE?.trim().toLowerCase();
   return mode === "live" ? "live" : "demo";
 }
 

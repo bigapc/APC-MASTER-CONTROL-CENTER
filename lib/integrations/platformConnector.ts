@@ -2,11 +2,12 @@
 // Aggregates all real per-platform connectors. Replace a connector import to
 // activate a new backend without changing any callers.
 import type { PlatformHealth, PlatformReport, PlatformUser } from "./types";
+import { getRuntimeStatus } from "@/lib/runtimeStatus";
 
 // ── Real connectors (Phase 10) ────────────────────────────────────────────────
-import { getSafeConnectReports, getSafeConnectUsers, getSafeConnectHealth } from "./connectors/safeconnect";
-import { getCSCReports, getCSCUsers, getCSCHealth } from "./connectors/communitySafeConnect";
-import { getCSC20Reports, getCSC20Users, getCSC20Health } from "./connectors/csc20";
+import { getSafeConnectReports, getSafeConnectUsers } from "./connectors/safeconnect";
+import { getCSCReports, getCSCUsers } from "./connectors/communitySafeConnect";
+import { getCSC20Reports, getCSC20Users } from "./connectors/csc20";
 
 // Dispatcher connector exposes full lifecycle — also consumed by dispatch API route.
 export {
@@ -39,10 +40,17 @@ export async function getAllUsers(): Promise<PlatformUser[]> {
 }
 
 export async function getPlatformHealth(): Promise<PlatformHealth[]> {
-  const [sc, csc, csc20] = await Promise.all([
-    getSafeConnectHealth(),
-    getCSCHealth(),
-    getCSC20Health(),
-  ]);
-  return [sc, csc, csc20];
+  const runtime = await getRuntimeStatus();
+  const platformIds = ["safeconnect", "communitysafeconnect", "csc_2_0"] as const;
+
+  return platformIds.map((appId) => {
+    const platform = runtime.platforms.find((entry) => entry.id === appId);
+    const reachable = platform?.publicReachable && platform.adminReachable;
+
+    return {
+      appId,
+      status: reachable ? "healthy" : runtime.liveRequested ? "warning" : "monitoring",
+      uptime: "n/a",
+    };
+  });
 }

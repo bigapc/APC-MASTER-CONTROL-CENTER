@@ -9,10 +9,11 @@ export async function OPTIONS(request: Request) {
 export async function GET(request: Request) {
   const health = await getPlatformHealth();
   const healthyPlatforms = health.filter((item) => item.status === "healthy").length;
+  const hasWarnings = health.some((item) => item.status === "warning");
 
   return withCors(NextResponse.json({
-    uptime: "99.9%",
-    status: healthyPlatforms === health.length ? "healthy" : "monitoring",
+    uptime: "n/a",
+    status: healthyPlatforms === health.length ? "healthy" : hasWarnings ? "warning" : "monitoring",
     platforms: health,
   }), request.headers.get("origin"));
 }

@@ -5,6 +5,20 @@ import Link from "next/link";
 const links = [
   "/dashboard",
   "/executive-command",
+  "/apc-ai",
+  "/academy",
+  "/work",
+  "/incidents",
+  "/gateway",
+  "/access-management",
+  "/access-audit",
+  "/governance",
+  "/organization",
+  "/personnel",
+  "/units",
+  "/integrations",
+  "/operations",
+  "/communications",
   "/admin-roles",
   "/apps",
   "/dispatch",
@@ -31,7 +45,37 @@ export default function CommandSidebar() {
             href={link}
             className="block rounded-xl p-3 hover:bg-zinc-900"
           >
-            {link === "/executive-command" ? "Executive Command" : link}
+            {link === "/executive-command"
+              ? "Executive Command"
+              : link === "/apc-ai"
+                ? "APC AI"
+                : link === "/academy"
+                  ? "APC Academy"
+                  : link === "/work"
+                    ? "Work Management"
+                    : link === "/incidents"
+                      ? "Incident Command"
+                      : link === "/gateway"
+                        ? "Integration Gateway"
+                        : link === "/access-management"
+                          ? "Access Management"
+                          : link === "/access-audit"
+                            ? "Access Audit"
+                            : link === "/governance"
+                              ? "Governance"
+                  : link === "/organization"
+                    ? "Organization"
+                    : link === "/personnel"
+                      ? "Personnel"
+                : link === "/units"
+                  ? "APC Units"
+                  : link === "/integrations"
+                    ? "Integrations"
+                    : link === "/operations"
+                      ? "Operations"
+                      : link === "/communications"
+                        ? "Communications"
+                        : link}
           </Link>
         ))}
       </nav>

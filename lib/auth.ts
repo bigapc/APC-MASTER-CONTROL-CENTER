@@ -195,15 +195,25 @@ export async function getUserFromSessionValue(
   try {
     const parsed = JSON.parse(new TextDecoder().decode(base64UrlToBytes(payload))) as {
       id?: string;
+      name?: string;
+      email?: string;
+      role?: UserRole;
       exp?: number;
     };
 
-    if (!parsed.id || !parsed.exp || parsed.exp < Date.now()) {
+    if (!parsed.id || !parsed.name || !parsed.email || !parsed.role || !parsed.exp || parsed.exp < Date.now()) {
       return null;
     }
 
     const found = authUsers.find((user) => user.id === parsed.id);
-    return found ? toCurrentUser(found) : null;
+    return found
+      ? toCurrentUser(found)
+      : {
+          id: parsed.id,
+          name: parsed.name,
+          email: parsed.email,
+          role: parsed.role,
+        };
   } catch {
     return null;
   }
@@ -214,6 +224,9 @@ export async function createSessionValue(user: CurrentUser): Promise<string> {
     new TextEncoder().encode(
       JSON.stringify({
         id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
         exp: Date.now() + SESSION_TTL_MS,
       })
     )

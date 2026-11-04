@@ -83,9 +83,9 @@ Optional but recommended:
 - `APC_OWNER_EMAIL` and `APC_OWNER_PASSWORD` for production local-fallback owner login
 - `APC_DISPATCHER_EMAIL` and `APC_DISPATCHER_PASSWORD` for production local-fallback dispatcher login
 - `APC_ENABLE_DEMO_CREDENTIALS=false` to explicitly disable demo credential fallback
-- `APC_PREVIEW_BYPASS_AUTH=true` to temporarily disable login and role checks for preview sessions
+- `APC_PREVIEW_BYPASS_AUTH=true` to enable the development-only demo-mode auth bypass
 
-Once those values are present, the backend status, control hubs, settings, and launch-readiness surfaces will treat each app as fully integrated.
+These values feed APC's configuration and endpoint-readiness checks; they do not by themselves implement authenticated API clients for the separate applications. See [Integration Status and Boundaries](#integration-status-and-boundaries) for the current connector scope.
 
 ### CSC-CorePlatform Same-Origin Local Mode
 
@@ -162,8 +162,20 @@ Compatibility mode (temporary migration only):
 ## Backend Notes
 
 - Supabase reads are handled through the shared helpers in `lib/supabase/*`.
-- The app falls back to demo data when live keys are missing.
+- Connectors can fall back to demo fixtures when Supabase is unavailable or a query returns no rows, including in live mode; review each integration's readiness before treating data as operational.
 - The login flow uses APC session cookies and redirects unauthenticated users to `/login`.
+
+## Integration Status and Boundaries
+
+The three platform connectors currently read APC's shared Supabase tables when live mode and credentials are configured; otherwise they return local demo fixtures. They do not yet make authenticated requests to the separate platform applications. The configured service-token variables are currently used for readiness checks, not for outbound API calls.
+
+- **SafeConnect:** Reads shared APC reports and dispatcher users, with demo fallbacks. GitHub repository/workflow data is separate from application health.
+- **CommunitySafeConnect:** Reads shared APC reports, users, and organizations, with demo fallbacks. A dedicated application API connector is not implemented.
+- **CommunitySafeConnect-CSC-2.0:** Reads reports and users from shared APC tables, with demo fallbacks. A dedicated application API connector and write lifecycle are not implemented.
+
+Signed inbound webhook routes exist for all three platforms. They validate timestamped HMAC signatures and publish events to APC's in-memory audit and notification services; durable webhook storage and outbound service-token authentication are not implemented. Check `/api/platforms` for configured/reachable readiness. Connectivity probes run only in live mode, so a false `reachable` value in demo mode means "not probed," not that the remote application is offline.
+
+On a fresh local setup, use demo mode to work without Supabase credentials. All three applications need their independent URLs, webhook secrets, and service/API contracts configured before their readiness can be verified; this repository does not replace or combine the separate application repositories.
 
 ## Stealth Operations Rule
 
@@ -193,9 +205,9 @@ In production, demo credentials are disabled by default unless explicitly enable
 
 ## Notes
 
-This project is intentionally safe to run in demo mode. Live mode only becomes active when the required Supabase and platform URL environment variables are present.
+This project is intentionally safe to run in demo mode. `NEXT_PUBLIC_DATA_MODE=live` selects live mode, but Supabase-backed reads require valid Supabase configuration and platform readiness requires configured, reachable endpoints.
 
-For temporary no-login preview, set `APC_PREVIEW_BYPASS_AUTH=true` (default is enabled in non-production). Set it to `false` to restore full auth enforcement.
+For local development in demo mode, authentication is bypassed only when `APC_PREVIEW_BYPASS_AUTH=true`. Missing or false values require sign-in. The bypass is disabled whenever `NODE_ENV` is not `development` or `NEXT_PUBLIC_DATA_MODE=live`; production always enforces authentication regardless of this setting.
 
 ## Brand Identity and Emergency Backup Standard
 

@@ -43,7 +43,7 @@ export default async function CommandHeader() {
 
         {readiness.previewBypass ? (
           <p className="mt-2 text-xs font-bold uppercase tracking-wide text-yellow-200">
-            Preview auth bypass is enabled. Set APC_PREVIEW_BYPASS_AUTH=false before launch.
+            Local development demo bypass is enabled. Production and live mode always require authentication.
           </p>
         ) : null}
       </div>

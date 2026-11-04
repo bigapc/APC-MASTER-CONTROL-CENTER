@@ -3,13 +3,19 @@ import { APC_COMMAND } from "@/lib/apcCommandCenter";
 import DataSourceBadge from "@/components/DataSourceBadge";
 import DatasetSourceList from "@/components/DatasetSourceList";
 import { getAdminRoleItemsWithSource } from "@/lib/supabaseAdapter";
+import AuthGuard from "@/components/AuthGuard";
+import RoleGuard from "@/components/RoleGuard";
+import ExecutiveLayout from "@/components/layouts/ExecutiveLayout";
 
 export default async function AdminRolesPage() {
   const adminRoleItemsResult = await getAdminRoleItemsWithSource();
   const adminRoleItems = adminRoleItemsResult.data;
 
   return (
-    <div className="space-y-8">
+    <AuthGuard>
+      <RoleGuard allowedRoles={["super_admin"]}>
+        <ExecutiveLayout>
+          <div className="space-y-8">
       <section className="apc-card-dark p-8">
         <div className="apc-badge">Access Control</div>
         <div className="mt-4">
@@ -75,6 +81,9 @@ export default async function AdminRolesPage() {
           ))}
         </div>
       </section>
-    </div>
+          </div>
+        </ExecutiveLayout>
+      </RoleGuard>
+    </AuthGuard>
   );
 }

@@ -3,6 +3,8 @@
 // about missing required environment variables. Never throws — only logs.
 // Keeps the app runnable in demo mode even when keys are absent.
 
+import { isLiveMode } from "@/lib/dataMode";
+
 interface EnvVar {
   name: string;
   required: boolean;
@@ -11,7 +13,6 @@ interface EnvVar {
 }
 
 const ENV_VARS: EnvVar[] = [
-  { name: "NEXT_PUBLIC_DATA_MODE", required: true },
   { name: "NEXT_PUBLIC_APP_NAME", required: true },
   { name: "NEXT_PUBLIC_APP_ORIGIN", required: false },
   { name: "APC_SESSION_SECRET", required: false, secret: true },
@@ -33,7 +34,7 @@ export interface EnvCheckResult {
 }
 
 export function checkEnv(): EnvCheckResult {
-  const isLive = process.env.NEXT_PUBLIC_DATA_MODE === "live";
+  const isLive = isLiveMode();
   const missing: string[] = [];
   const warnings: string[] = [];
 
@@ -43,7 +44,7 @@ export function checkEnv(): EnvCheckResult {
 
     if ((v.required || isLiveRequired) && !value) {
       missing.push(v.name);
-    } else if (!value && !v.secret) {
+    } else if (!value && !v.secret && !v.liveOnly) {
       warnings.push(`${v.name} is not set (optional)`);
     }
   }

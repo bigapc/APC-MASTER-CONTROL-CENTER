@@ -6,6 +6,7 @@ import {
   validateCredentials,
 } from "@/lib/auth";
 import { supabaseSignIn } from "@/lib/supabase/auth";
+import { hasSupabaseConfig, isLiveMode } from "@/lib/dataMode";
 import { checkRateLimit, retryAfterSeconds } from "@/lib/security/rateLimit";
 import { getClientIp, methodNotAllowed, withCors } from "@/lib/security/apiHelpers";
 
@@ -41,8 +42,20 @@ export async function POST(request: Request) {
   const email = body?.email?.trim() ?? "";
   const password = body?.password ?? "";
 
+  const liveMode = isLiveMode();
+
+  if (liveMode && !hasSupabaseConfig()) {
+    return withCors(
+      NextResponse.json(
+        { success: false, message: "Authentication service is not configured." },
+        { status: 503 }
+      ),
+      requestOrigin
+    );
+  }
+
   const liveUser = await supabaseSignIn(email, password);
-  const user = liveUser ?? validateCredentials(email, password);
+  const user = liveUser ?? (liveMode ? null : validateCredentials(email, password));
 
   if (!user) {
     return withCors(
